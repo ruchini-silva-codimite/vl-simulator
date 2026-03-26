@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VLauncher Deployment Simulator v2 - Pro</title>
+    <title>VLauncher Deployment Strategy — Controlled Rollout Model</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <style>
@@ -43,6 +43,17 @@
 
         .main-container { flex: 1; display: flex; flex-direction: column; padding: 30px 40px; gap: 30px; overflow-y: auto; }
         
+        .banner-note {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+        .banner-note b { color: var(--text); }
+
         .simulation-grid { display: flex; gap: 40px; align-items: stretch; position: relative; }
 
         .instance-card {
@@ -94,7 +105,7 @@
 
         /* Package Animation */
         .package {
-            position: absolute; width: 10px; height: 10px; border-radius: 50%;
+            position: absolute; width: 100px; height: 10px; border-radius: 50%;
             background: #fff; box-shadow: 0 0 12px #fff;
             z-index: 20; display: none; left: 12px; top: 50%; margin-top: -15px;
         }
@@ -110,7 +121,7 @@
         .v-logo { width: 30px; height: 30px; fill: var(--primary); opacity: 0.1; transition: 0.5s; }
         .laptop.ready .v-logo { opacity: 1; filter: drop-shadow(0 0 8px var(--primary-glow)); }
 
-        .server-rack { display: flex; gap: 12px; z-index: 5; margin-left: auto; margin-right: 20px; }
+        .server-rack { display: flex; gap: 12px; z-index: 5; margin-left: auto; margin-right: 40px; }
         .node {
             width: 85px; height: 110px; background: #1e293b; border: 2px solid var(--border); border-radius: 12px;
             display: flex; flex-direction: column; padding: 8px; gap: 6px; transition: 0.5s; position: relative;
@@ -126,7 +137,7 @@
 
         /* Gate and Validation placement */
         .val-anchor { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 100; display: none; }
-        .gate-center { width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding-top: 60px; }
+        .gate-center { width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; padding-top: 20px; }
         .gate-btn {
             width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface);
             display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; color: var(--text-dim);
@@ -135,6 +146,12 @@
         .gate-btn.fail:hover { border-color: var(--error); color: var(--error); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
         .gate-btn.selected.ok { background: var(--success); border-color: var(--success); color: #fff; box-shadow: 0 0 30px var(--success-glow); }
         .gate-btn.selected.fail { background: var(--error); border-color: var(--error); color: #fff; box-shadow: 0 0 30px rgba(239, 68, 68, 0.3); }
+
+        .btn-reset {
+            margin-bottom: 10px; padding: 8px 16px; background: var(--surface-light); border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text); font-size: 0.7rem; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+        }
+        .btn-reset:hover { background: var(--border); }
 
         .footer-workflow {
             background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px 35px;
@@ -164,31 +181,32 @@
 <body>
 
     <header>
-        <div class="logo">VLAUNCHER <span>DEPLOYMENT_STUDIO_v2</span></div>
+        <div class="logo">VLauncher <span>Deployment Strategy — Controlled Rollout Model</span></div>
         <div style="display: flex; gap: 20px; align-items: center;">
             <div id="sys-stat" style="font-family: var(--mono); font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px 15px; border-radius: 100px;">
                 SYSTEM_READY // v1.2.2_STABLE
             </div>
-            <button style="padding: 10px; background: var(--surface-light); border: none; border-radius: 10px; color: #fff; cursor: pointer;" onclick="location.reload()">
-                <span class="material-symbols-rounded" style="font-size: 20px;">refresh</span>
-            </button>
         </div>
     </header>
 
     <nav class="nav-tabs">
-        <button class="nav-btn active" id="tab-single" onclick="setArch('single')">Single Server</button>
-        <button class="nav-btn" id="tab-ha" onclick="setArch('ha')">HA Cluster</button>
+        <button class="nav-btn active" id="tab-single" onclick="setArch('single')">Single Server Deployment</button>
+        <button class="nav-btn" id="tab-ha" onclick="setArch('ha')">Multi-Server Deployment (HA)</button>
     </nav>
 
     <div class="main-container">
         
+        <div class="banner-note">
+            Rollback is not introduced in GA by design. <b>VLauncher</b> validates updates in a test environment before promoting to production to ensure stability.
+        </div>
+
         <div class="simulation-grid">
             
             <div class="instance-card test">
                 <div class="card-tag">Test Instance</div>
                 
                 <!-- VAL BUTTON ANCHOR - Centered in Test Instance -->
-                <div class="val-anchor" id="val-anchor">
+               <div class="val-anchor" id="val-anchor">
                     <button class="btn-val" onclick="completeValidation()">
                         Complete Validation <span class="material-symbols-rounded">fact_check</span>
                     </button>
@@ -246,12 +264,15 @@
                 </div>
             </div>
 
-            <div class="gate-center" id="gate" style="opacity: 0.1; pointer-events: none;">
-                <div class="gate-btn ok" onclick="decide('ok')">
-                    <span class="material-symbols-rounded">verified</span>
-                </div>
-                <div class="gate-btn fail" onclick="decide('fail')">
-                    <span class="material-symbols-rounded">block</span>
+            <div class="gate-center">
+                <button class="btn-reset" onclick="location.reload()">Reset</button>
+                <div id="gate" style="opacity: 0.1; pointer-events: none; display: flex; flex-direction: column; gap: 30px;">
+                    <div class="gate-btn ok" onclick="decide('ok')">
+                        <span class="material-symbols-rounded">verified</span>
+                    </div>
+                    <div class="gate-btn fail" onclick="decide('fail')">
+                        <span class="material-symbols-rounded">block</span>
+                    </div>
                 </div>
             </div>
 
@@ -303,7 +324,7 @@
             <div style="flex: 1;">
                 <div style="font-size: 0.7rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; text-transform: uppercase;">Sequence Control</div>
                 <div class="log-display" id="logs">
-                    <div class="log-entry"><span>[SYS]</span> Console initialized. Architecture: Single Server.</div>
+                    <div class="log-entry"><span>[SYS]</span> Console initialized. Architecture: Single Server Deployment.</div>
                 </div>
             </div>
         </div>
@@ -336,11 +357,11 @@
             if(type === 'ha') {
                 rTest.innerHTML = nodeHTML.repeat(3);
                 rProd.innerHTML = nodeHTML.repeat(3);
-                addLog("Switched to HA Cluster configuration.");
+                addLog("Switched to Multi-Server Deployment (HA) configuration.");
             } else {
                 rTest.innerHTML = nodeHTML;
                 rProd.innerHTML = nodeHTML;
-                addLog("Switched to Single Server baseline.");
+                addLog("Switched to Single Server Deployment baseline.");
             }
         }
 
