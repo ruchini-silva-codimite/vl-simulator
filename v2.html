@@ -9,16 +9,16 @@
     <style>
         :root {
             --bg: #030712;
-            --surface: #111827;
-            --surface-light: #1f2937;
-            --border: #374151;
+            --surface: #0f172a;
+            --surface-light: #1e293b;
+            --border: #334155;
             --primary: #3b82f6;
             --primary-glow: rgba(59, 130, 246, 0.4);
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
-            --text: #f9fafb;
-            --text-dim: #9ca3af;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
             --mono: 'JetBrains Mono', monospace;
         }
 
@@ -27,101 +27,104 @@
 
         /* --- Tabs Navigation --- */
         .tab-nav {
-            display: flex; gap: 4px; padding: 20px 40px 0; background: var(--bg); border-bottom: 1px solid var(--border);
+            display: flex; gap: 4px; padding: 15px 30px 0; background: var(--bg); border-bottom: 1px solid var(--border);
         }
         .tab-btn {
-            padding: 12px 24px; background: transparent; border: none; color: var(--text-dim); cursor: pointer;
-            font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; border-radius: 12px 12px 0 0;
+            padding: 10px 20px; background: transparent; border: none; color: var(--text-dim); cursor: pointer;
+            font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px 10px 0 0;
             transition: 0.2s; position: relative;
         }
         .tab-btn.active { color: var(--primary); background: var(--surface); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--primary); }
 
-        .tab-content { display: none; flex: 1; padding: 40px; overflow-y: auto; }
-        .tab-content.active { display: flex; flex-direction: column; gap: 30px; }
+        .tab-content { display: none; flex: 1; padding: 30px; overflow-y: auto; }
+        .tab-content.active { display: flex; flex-direction: column; gap: 20px; }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
         .card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px;
             display: flex; flex-direction: column; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .card-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
 
-        /* --- Flow Diagrams (Tree Style) --- */
-        .flow-container { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 15px; padding-top: 10px; position: relative; }
-        .flow-step {
-            width: 100%; max-width: 280px; padding: 12px; border-radius: 12px; border: 1px solid var(--border);
-            background: var(--surface-light); text-align: center; font-size: 0.75rem; font-weight: 700;
-            position: relative; transition: 0.3s;
-        }
-        .flow-step.active { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); color: var(--primary); }
-        .flow-step.complete { border-color: var(--success); color: var(--success); }
-        .flow-step.failed { border-color: var(--error); color: var(--error); }
+        /* --- COMPACT FLOW ENGINE --- */
+        .flow-container { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
         
-        .connector { width: 2px; height: 20px; background: var(--border); transition: 0.3s; }
-        .connector.active { background: var(--primary); }
-
-        .decision-branch { display: flex; gap: 40px; width: 100%; justify-content: center; position: relative; }
-        .decision-branch::before {
-            content: ''; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-            width: 140px; height: 20px; border-top: 2px solid var(--border); border-left: 2px solid var(--border); border-right: 2px solid var(--border);
+        .node-pill {
+            width: 100%; max-width: 240px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--surface-light); display: flex; align-items: center; gap: 10px; font-size: 0.7rem; font-weight: 700;
+            transition: 0.3s; position: relative;
         }
+        .node-pill i { font-size: 16px; opacity: 0.5; }
+        .node-pill.active { border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); color: var(--primary); }
+        .node-pill.active i { opacity: 1; color: var(--primary); }
+        .node-pill.complete { border-color: var(--success); color: var(--success); }
+        .node-pill.complete i { opacity: 1; color: var(--success); }
+        .node-pill.failed { border-color: var(--error); color: var(--error); }
+        .node-pill.failed i { opacity: 1; color: var(--error); }
+        
+        .connector-sm { width: 2px; height: 10px; background: var(--border); }
+        .connector-sm.active { background: var(--primary); }
 
-        .branch-node { display: flex; flex-direction: column; align-items: center; gap: 15px; flex: 1; }
-
-        /* --- Backend Infrastructure View --- */
-        .infra-view {
-            height: 120px; background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px dashed var(--border);
-            display: flex; align-items: center; justify-content: space-around; padding: 15px; margin-bottom: 20px;
+        .decision-compact { 
+            display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 5px; padding-top: 10px;
+            border-top: 1px dashed var(--border);
         }
-        .server-node { display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.5s; opacity: 0.4; }
-        .server-node.active { opacity: 1; }
-        .server-icon {
-            width: 40px; height: 50px; background: #1e293b; border: 2px solid var(--border); border-radius: 6px;
-            position: relative; display: flex; align-items: center; justify-content: center;
+        .outcome-pill {
+            flex: 1; max-width: 140px; padding: 8px; border-radius: 8px; border: 1px solid var(--border);
+            font-size: 0.6rem; text-align: center; font-weight: 800; opacity: 0.3; transition: 0.3s;
+            display: flex; flex-direction: column; gap: 4px;
         }
-        .server-node.updating .server-icon { border-color: var(--warning); box-shadow: 0 0 10px var(--warning); }
-        .server-node.ready .server-icon { border-color: var(--success); box-shadow: 0 0 10px var(--success); }
-        .server-label { font-size: 0.55rem; font-family: var(--mono); color: var(--text-dim); }
+        .outcome-pill.active { opacity: 1; border-color: inherit; background: rgba(255,255,255,0.05); }
+        .outcome-pill.ok { border-color: var(--success); color: var(--success); }
+        .outcome-pill.fail { border-color: var(--error); color: var(--error); }
 
-        /* --- Cluster Visual --- */
-        .cluster-ring { display: flex; justify-content: center; gap: 24px; padding: 20px; margin-bottom: 20px; }
-        .node-big {
-            width: 100px; height: 120px; background: #1e293b; border: 2px solid var(--primary); border-radius: 16px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transition: 0.6s;
-            box-shadow: 0 0 20px var(--primary-glow); position: relative;
+        /* --- Infrastructure Visuals --- */
+        .infra-mini {
+            height: 80px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed var(--border);
+            display: flex; align-items: center; justify-content: space-around; padding: 10px; margin-bottom: 15px;
         }
-        .node-big.removed { transform: scale(0.6) translateY(50px); opacity: 0; filter: blur(5px); }
-        .node-big .status-led { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .srv-tiny { display: flex; flex-direction: column; align-items: center; gap: 5px; opacity: 0.2; transition: 0.5s; }
+        .srv-tiny.active { opacity: 1; }
+        .srv-box { width: 28px; height: 35px; background: #1e293b; border: 1.5px solid var(--border); border-radius: 4px; position: relative; }
+        .srv-tiny.updating .srv-box { border-color: var(--warning); box-shadow: 0 0 8px var(--warning); }
+        .srv-tiny.ready .srv-box { border-color: var(--success); box-shadow: 0 0 8px var(--success); }
+        .srv-label { font-size: 0.5rem; font-family: var(--mono); color: var(--text-dim); }
 
-        /* --- Global UI --- */
-        .log-stream {
-            height: 100px; background: #000; border-radius: 12px; padding: 12px; font-family: var(--mono); font-size: 0.7rem; overflow-y: hidden;
-            display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--border); margin-top: 15px;
+        /* --- Lifecycle Visual --- */
+        .cluster-compact { display: flex; justify-content: center; gap: 15px; padding: 15px; }
+        .node-card {
+            width: 75px; height: 90px; background: #1e293b; border: 2px solid var(--primary); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; transition: 0.5s;
+            box-shadow: 0 0 15px var(--primary-glow);
         }
-        .log-entry { color: #4ade80; opacity: 0.8; }
-        .log-entry span { color: var(--text-dim); margin-right: 8px; }
+        .node-card.removed { transform: scale(0.6); opacity: 0; filter: blur(4px); }
+        .status-led-sm { width: 5px; height: 5px; border-radius: 50%; background: var(--success); box-shadow: 0 0 5px var(--success); }
 
-        .arch-note {
-            background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px; padding: 20px;
-            font-size: 0.8rem; line-height: 1.6; color: var(--text-dim);
+        /* --- Logs & UI --- */
+        .log-compact {
+            height: 70px; background: #000; border-radius: 10px; padding: 10px; font-family: var(--mono); font-size: 0.65rem; overflow: hidden;
+            display: flex; flex-direction: column; gap: 3px; border: 1px solid var(--border); margin-top: 10px;
         }
+        .log-entry { color: #4ade80; opacity: 0.7; }
+        .log-entry span { color: var(--text-dim); margin-right: 6px; }
 
-        .controls { display: flex; gap: 10px; margin-top: auto; }
-        .btn {
-            flex: 1; background: var(--surface-light); border: 1px solid var(--border); padding: 10px; border-radius: 12px;
-            color: var(--text); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;
+        .note-p { background: rgba(59, 130, 246, 0.05); border-radius: 12px; padding: 12px; font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; }
+
+        .controls { display: flex; gap: 8px; margin-top: auto; }
+        .btn-sm {
+            flex: 1; background: var(--surface-light); border: 1px solid var(--border); padding: 8px; border-radius: 8px;
+            color: var(--text); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s;
         }
-        .btn:hover:not(:disabled) { background: #374151; }
-        .btn.primary { background: var(--primary); border: none; }
-        .btn.danger { color: var(--error); border-color: rgba(239, 68, 68, 0.2); }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-sm:hover:not(:disabled) { background: #334155; }
+        .btn-sm.primary { background: var(--primary); border: none; }
+        .btn-sm.danger { color: var(--error); border-color: rgba(239, 68, 68, 0.2); }
+        .btn-sm:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .badge { font-size: 0.5rem; font-weight: 900; background: var(--warning); color: #000; padding: 2px 6px; border-radius: 4px; position: absolute; top: -8px; right: -8px; }
-
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 18px; }
+        .badge-sm { font-size: 0.45rem; font-weight: 900; background: var(--warning); color: #000; padding: 1px 4px; border-radius: 3px; margin-left: auto; }
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -135,101 +138,92 @@
     <div id="tab-rollout" class="tab-content active">
         <div class="grid-2">
             
-            <!-- Google Admin Console Flow -->
+            <!-- Google Admin Console -->
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title"><span class="material-symbols-rounded">settings_ethernet</span> Google Admin Console Pipeline</div>
-                    <button class="btn" style="width: 40px; flex: none;" onclick="resetGacFlow()"><span class="material-symbols-rounded">refresh</span></button>
+                    <div class="card-title"><span class="material-symbols-rounded">settings_ethernet</span> GAC Pipeline</div>
+                    <button class="btn-sm" style="width: 32px; flex: none;" onclick="resetGac()"><span class="material-symbols-rounded">refresh</span></button>
                 </div>
 
-                <div class="flow-container" id="gac-flow">
-                    <div class="flow-step active" id="g-s1">VLauncher Extension Update <div class="badge">Extension</div></div>
-                    <div class="connector" id="g-c1"></div>
-                    <div class="flow-step" id="g-s2">Deploy to Test OU</div>
-                    <div class="connector" id="g-c2"></div>
-                    <div class="flow-step" id="g-s3">Validate Behavior</div>
-                    <div class="decision-branch" id="g-dec" style="display: none;">
-                        <div class="branch-node">
-                            <div class="flow-step complete" id="g-s4a">Validation OK</div>
-                            <div class="connector"></div>
-                            <div class="flow-step complete" style="max-width: 180px;">Prod OU: Unpin & Deploy Latest</div>
+                <div class="flow-container">
+                    <div class="node-pill active" id="gs1"><i class="material-symbols-rounded">extension</i> Extension Update <span class="badge-sm">CRX</span></div>
+                    <div class="connector-sm" id="gc1"></div>
+                    <div class="node-pill" id="gs2"><i class="material-symbols-rounded">science</i> Deploy to Test OU</div>
+                    <div class="connector-sm" id="gc2"></div>
+                    <div class="node-pill" id="gs3"><i class="material-symbols-rounded">verified_user</i> Validate Behavior</div>
+                    
+                    <div class="decision-compact" id="g-dec" style="display: none;">
+                        <div class="outcome-pill ok" id="go-ok">
+                            <span style="font-size: 0.5rem; opacity: 0.6;">PROD OU</span>
+                            Unpin & Deploy
                         </div>
-                        <div class="branch-node">
-                            <div class="flow-step failed" id="g-s4b">Issue Found</div>
-                            <div class="connector"></div>
-                            <div class="flow-step failed" style="max-width: 180px;">Prod OU: Keep Previous Pin</div>
+                        <div class="outcome-pill fail" id="go-fail">
+                            <span style="font-size: 0.5rem; opacity: 0.6;">PROD OU</span>
+                            Keep Previous Pin
                         </div>
                     </div>
                 </div>
 
-                <div class="log-stream" id="gac-logs">
-                    <div class="log-entry"><span>[GAC]</span> Ready for update.</div>
+                <div class="log-compact" id="g-logs">
+                    <div class="log-entry"><span>[GAC]</span> Awaiting update trigger...</div>
                 </div>
 
-                <div class="controls" id="g-controls">
-                    <button class="btn primary" onclick="gacNextStep()" id="g-btn-next">Begin Test Rollout</button>
-                    <div id="g-choice" style="display: none; gap: 10px; width: 100%;">
-                        <button class="btn primary" onclick="gacChoice('ok')">Validation OK</button>
-                        <button class="btn danger" onclick="gacChoice('fail')">Issue Found</button>
+                <div class="controls" id="g-ctrl">
+                    <button class="btn-sm primary" onclick="gNext()" id="g-next">Start Rollout</button>
+                    <div id="g-choice" style="display: none; gap: 8px; width: 100%;">
+                        <button class="btn-sm primary" onclick="gFinal('ok')">Validate OK</button>
+                        <button class="btn-sm danger" onclick="gFinal('fail')">Issue Found</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Admin Studio Backend Flow -->
+            <!-- Backend Infrastructure -->
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title"><span class="material-symbols-rounded">dns</span> Admin Studio (Backend) Update</div>
-                    <button class="btn" style="width: 40px; flex: none;" onclick="resetBeFlow()"><span class="material-symbols-rounded">refresh</span></button>
+                    <div class="card-title"><span class="material-symbols-rounded">dns</span> Backend Infrastructure</div>
+                    <button class="btn-sm" style="width: 32px; flex: none;" onclick="resetBe()"><span class="material-symbols-rounded">refresh</span></button>
                 </div>
 
-                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                    <button class="btn" id="be-solo" onclick="setBeArch('solo')" style="font-size: 0.6rem;">Solo Test Instance</button>
-                    <button class="btn primary" id="be-ha" onclick="setBeArch('ha')" style="font-size: 0.6rem;">HA Test Instance</button>
+                <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                    <button class="btn-sm" id="b-solo" onclick="setArch('solo')" style="font-size: 0.55rem;">Solo Server</button>
+                    <button class="btn-sm primary" id="b-ha" onclick="setArch('ha')" style="font-size: 0.55rem;">HA Cluster</button>
                 </div>
 
-                <div class="infra-view" id="be-infra">
-                    <div class="server-node active" id="bn-1"><div class="server-icon"><span class="material-symbols-rounded" style="opacity:0.2">window</span></div><span class="server-label">SRV_01</span></div>
-                    <div class="server-node active" id="bn-2"><div class="server-icon"><span class="material-symbols-rounded" style="opacity:0.2">window</span></div><span class="server-label">SRV_02</span></div>
-                    <div class="server-node active" id="bn-3"><div class="server-icon"><span class="material-symbols-rounded" style="opacity:0.2">window</span></div><span class="server-label">SRV_03</span></div>
+                <div class="infra-mini">
+                    <div class="srv-tiny active" id="bn1"><div class="srv-box"></div><span class="srv-label">T01</span></div>
+                    <div class="srv-tiny active" id="bn2"><div class="srv-box"></div><span class="srv-label">T02</span></div>
+                    <div class="srv-tiny active" id="bn3"><div class="srv-box"></div><span class="srv-label">T03</span></div>
                 </div>
 
-                <div class="flow-container" id="be-flow">
-                    <div class="flow-step active" id="b-s1">VLauncher Backend Update</div>
-                    <div class="connector" id="b-c1"></div>
-                    <div class="flow-step" id="b-s2">Deploy to Test Instance</div>
-                    <div class="connector" id="b-c2"></div>
-                    <div class="flow-step" id="b-s3">Validate Update</div>
-                    <div class="decision-branch" id="b-dec" style="display: none;">
-                        <div class="branch-node">
-                            <div class="flow-step complete" id="b-s4a">Validation OK</div>
-                            <div class="connector"></div>
-                            <div class="flow-step complete" style="max-width: 180px;">Apply to Prod Cluster</div>
-                        </div>
-                        <div class="branch-node">
-                            <div class="flow-step failed" id="b-s4b">Issue Found</div>
-                            <div class="connector"></div>
-                            <div class="flow-step failed" style="max-width: 180px;">Halt Prod Update</div>
-                        </div>
+                <div class="flow-container">
+                    <div class="node-pill active" id="bs1"><i class="material-symbols-rounded">terminal</i> Backend Update</div>
+                    <div class="connector-sm" id="bc1"></div>
+                    <div class="node-pill" id="bs2"><i class="material-symbols-rounded">dns</i> Deploy to Test</div>
+                    <div class="connector-sm" id="bc2"></div>
+                    <div class="node-pill" id="bs3"><i class="material-symbols-rounded">fact_check</i> Validate Update</div>
+                    
+                    <div class="decision-compact" id="b-dec" style="display: none;">
+                        <div class="outcome-pill ok" id="bo-ok">Apply to Prod</div>
+                        <div class="outcome-pill fail" id="bo-fail">Halt Update</div>
                     </div>
                 </div>
 
-                <div class="log-stream" id="be-logs">
-                    <div class="log-entry"><span>[SYS]</span> Backend architecture: HA.</div>
+                <div class="log-compact" id="b-logs">
+                    <div class="log-entry"><span>[SYS]</span> Ready for backend update.</div>
                 </div>
 
-                <div class="controls" id="b-controls">
-                    <button class="btn primary" onclick="beNextStep()" id="b-btn-next">Deploy to Test</button>
-                    <div id="b-choice" style="display: none; gap: 10px; width: 100%;">
-                        <button class="btn primary" onclick="beChoice('ok')">Validation OK</button>
-                        <button class="btn danger" onclick="beChoice('fail')">Issue Found</button>
+                <div class="controls" id="b-ctrl">
+                    <button class="btn-sm primary" onclick="bNext()" id="b-next">Deploy Update</button>
+                    <div id="b-choice" style="display: none; gap: 8px; width: 100%;">
+                        <button class="btn-sm primary" onclick="bFinal('ok')">Success</button>
+                        <button class="btn-sm danger" onclick="bFinal('fail')">Issue Found</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="arch-note" style="margin-top: 20px;">
-            <span class="material-symbols-rounded" style="vertical-align: middle; color: var(--warning);">info</span>
-            <strong>Rollback Policy:</strong> Rollback is <strong>not introduced in GA</strong>. Version drift between the Extension and Admin Studio could cause protocol mismatches during VDI launch. Validation in Test OUs/Instances is the mandatory path before Prod rollout.
+        <div class="note-p">
+            <strong>GA Policy:</strong> Rollback is disabled to prevent Extension/Backend protocol drift. Validation via Test OUs/Instances is the mandatory path.
         </div>
     </div>
 
@@ -238,33 +232,32 @@
         <div class="grid-2">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">HA Cluster Governance</div>
-                    <div id="quorum-pill" style="font-size: 0.6rem; color: var(--success); font-weight: 900; border: 1px solid var(--success); padding: 2px 8px; border-radius: 4px;">QUORUM: OK</div>
+                    <div class="card-title">Cluster Governance</div>
+                    <div id="q-pill" style="font-size: 0.5rem; color: var(--success); font-weight: 900; border: 1px solid var(--success); padding: 1px 6px; border-radius: 4px;">QUORUM: OK</div>
                 </div>
 
-                <div class="cluster-ring">
-                    <div class="node-big" id="un-1"><div class="status-led"></div><span class="material-symbols-rounded" style="font-size: 40px;">dns</span><span style="font-size: 0.6rem; font-family: var(--mono);">NODE_A</span></div>
-                    <div class="node-big" id="un-2"><div class="status-led"></div><span class="material-symbols-rounded" style="font-size: 40px;">dns</span><span style="font-size: 0.6rem; font-family: var(--mono);">NODE_B</span></div>
-                    <div class="node-big" id="un-3"><div class="status-led"></div><span class="material-symbols-rounded" style="font-size: 40px;">dns</span><span style="font-size: 0.6rem; font-family: var(--mono);">NODE_C</span></div>
+                <div class="cluster-compact">
+                    <div class="node-card" id="u1"><div class="status-led-sm"></div><span class="material-symbols-rounded" style="font-size: 24px;">dns</span><span style="font-size: 0.5rem; font-family: var(--mono);">SRV_A</span></div>
+                    <div class="node-card" id="u2"><div class="status-led-sm"></div><span class="material-symbols-rounded" style="font-size: 24px;">dns</span><span style="font-size: 0.5rem; font-family: var(--mono);">SRV_B</span></div>
+                    <div class="node-card" id="u3"><div class="status-led-sm"></div><span class="material-symbols-rounded" style="font-size: 24px;">dns</span><span style="font-size: 0.5rem; font-family: var(--mono);">SRV_C</span></div>
                 </div>
 
-                <div class="log-stream" id="un-logs" style="height: 140px;">
-                    <div class="log-entry"><span>[CLUSTER]</span> Multi-server environment active.</div>
+                <div class="log-compact" id="u-logs">
+                    <div class="log-entry"><span>[HA]</span> Cluster active. Nodes synced.</div>
                 </div>
 
                 <div class="controls">
-                    <button class="btn" onclick="singleUninstall()" id="un-btn-single">Single Node Uninstall</button>
-                    <button class="btn danger" onclick="clusterUninstall()" id="un-btn-all">Cluster-Wide Uninstall</button>
-                    <button class="btn" style="flex: 0; width: 50px;" onclick="resetLifecycle()"><span class="material-symbols-rounded">refresh</span></button>
+                    <button class="btn-sm" onclick="doSingle()" id="u-btn-s">Single Node</button>
+                    <button class="btn-sm danger" onclick="doAll()" id="u-btn-a">Cluster-Wide</button>
+                    <button class="btn-sm" style="flex: 0; width: 40px;" onclick="resetLife()"><span class="material-symbols-rounded">refresh</span></button>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-title" style="margin-bottom: 20px;">Requirement Summary</div>
-                <div style="font-size: 0.85rem; line-height: 1.8; color: var(--text-dim);">
-                    <h4 style="color: var(--text); margin-bottom: 10px;">Uninstallation Standards</h4>
-                    <p><strong>Single Node:</strong> Removes a node from cluster membership. Node binaries are purged while the remaining cluster maintains session persistence. Quorum (n/2 + 1) is validated before removal.</p>
-                    <p style="margin-top: 15px;"><strong>Cluster-Wide:</strong> Full decommissioning. Triggers a coordinated purge of node records and global config across all participating servers and Active Directory.</p>
+                <div class="card-title" style="margin-bottom: 12px;">Uninstallation Standards</div>
+                <div style="font-size: 0.7rem; line-height: 1.6; color: var(--text-dim);">
+                    <p><strong>1. Single Node:</strong> Removes membership record and purges server binaries. Quorum must remain above 50%.</p>
+                    <p style="margin-top: 10px;"><strong>2. Cluster-Wide:</strong> Full decommissioning. Wipes global config store and clears AD object associations.</p>
                 </div>
             </div>
         </div>
@@ -288,129 +281,115 @@
         }
 
         /* --- GAC Logic --- */
-        let gacStep = 1;
-        function gacNextStep() {
-            if(gacStep === 1) {
-                document.getElementById('g-s1').classList.add('complete');
-                document.getElementById('g-c1').classList.add('active');
-                document.getElementById('g-s2').classList.add('active');
-                document.getElementById('g-btn-next').innerText = "Simulate Validation";
-                addLog('gac-logs', "Extension deployed to Test OU.");
-            } else if(gacStep === 2) {
-                document.getElementById('g-s2').classList.add('complete');
-                document.getElementById('g-c2').classList.add('active');
-                document.getElementById('g-s3').classList.add('active');
-                document.getElementById('g-btn-next').style.display = "none";
+        let gStep = 1;
+        function gNext() {
+            if(gStep === 1) {
+                document.getElementById('gs1').classList.add('complete');
+                document.getElementById('gc1').classList.add('active');
+                document.getElementById('gs2').classList.add('active');
+                document.getElementById('g-next').innerText = "Simulate Validation";
+                addLog('g-logs', "Deployed to Google Admin Console Test OU.");
+            } else if(gStep === 2) {
+                document.getElementById('gs2').classList.add('complete');
+                document.getElementById('gc2').classList.add('active');
+                document.getElementById('gs3').classList.add('active');
+                document.getElementById('g-next').style.display = "none";
                 document.getElementById('g-choice').style.display = "flex";
-                addLog('gac-logs', "Validation cycle started on pilot devices...");
+                addLog('g-logs', "Validation cycle started on test endpoints...");
             }
-            gacStep++;
+            gStep++;
         }
-        function gacChoice(type) {
-            document.getElementById('g-s3').classList.add('complete');
+        function gFinal(type) {
+            document.getElementById('gs3').classList.add('complete');
             document.getElementById('g-dec').style.display = "flex";
             document.getElementById('g-choice').style.display = "none";
-            if(type === 'ok') {
-                addLog('gac-logs', "VALIDATION OK. Promoting update to Prod OU.");
-            } else {
-                addLog('gac-logs', "ISSUE DETECTED. Version pinning maintained in Prod.");
-            }
+            document.getElementById(type === 'ok' ? 'go-ok' : 'go-fail').classList.add('active');
+            addLog('g-logs', type === 'ok' ? "VALIDATION OK. Deploying to Prod OU." : "ISSUE FOUND. Rollout aborted for Prod.");
         }
-        function resetGacFlow() {
-            gacStep = 1;
-            document.querySelectorAll('#gac-flow .flow-step').forEach(s => s.classList.remove('active', 'complete', 'failed'));
-            document.querySelectorAll('#gac-flow .connector').forEach(c => c.classList.remove('active'));
-            document.getElementById('g-s1').classList.add('active');
+        function resetGac() {
+            gStep = 1;
+            document.querySelectorAll('#tab-rollout .card:first-child .node-pill').forEach(s => s.classList.remove('active', 'complete', 'failed'));
+            document.querySelectorAll('#tab-rollout .card:first-child .connector-sm').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('#g-dec .outcome-pill').forEach(o => o.classList.remove('active'));
+            document.getElementById('gs1').classList.add('active');
             document.getElementById('g-dec').style.display = "none";
-            document.getElementById('g-btn-next').style.display = "flex";
-            document.getElementById('g-btn-next').innerText = "Begin Test Rollout";
+            document.getElementById('g-next').style.display = "flex";
+            document.getElementById('g-next').innerText = "Start Rollout";
             document.getElementById('g-choice').style.display = "none";
-            document.getElementById('gac-logs').innerHTML = '<div class="log-entry"><span>[GAC]</span> Ready for update.</div>';
+            document.getElementById('g-logs').innerHTML = '<div class="log-entry"><span>[GAC]</span> Awaiting update trigger...</div>';
         }
 
         /* --- Backend Logic --- */
-        let beStep = 1;
-        let beArch = 'ha';
-        function setBeArch(type) {
-            beArch = type;
-            document.getElementById('be-solo').classList.toggle('primary', type === 'solo');
-            document.getElementById('be-ha').classList.toggle('primary', type === 'ha');
-            const nodes = document.querySelectorAll('#be-infra .server-node');
-            nodes.forEach((n, i) => n.classList.toggle('active', type === 'ha' || i === 0));
-            addLog('be-logs', `Architecture set to: ${type.toUpperCase()}.`);
+        let bStep = 1; let bArch = 'ha';
+        function setArch(t) {
+            bArch = t;
+            document.getElementById('b-solo').classList.toggle('primary', t === 'solo');
+            document.getElementById('b-ha').classList.toggle('primary', t === 'ha');
+            document.querySelectorAll('#bn2, #bn3').forEach(n => n.classList.toggle('active', t === 'ha'));
         }
-        function beNextStep() {
-            if(beStep === 1) {
-                document.getElementById('b-s1').classList.add('complete');
-                document.getElementById('b-c1').classList.add('active');
-                document.getElementById('b-s2').classList.add('active');
-                document.querySelectorAll('#be-infra .server-node.active').forEach(n => n.classList.add('updating'));
-                document.getElementById('b-btn-next').innerText = "Perform Validation";
-                addLog('be-logs', `Updating Test Instance (${beArch.toUpperCase()})...`);
-            } else if(beStep === 2) {
-                document.getElementById('b-s2').classList.add('complete');
-                document.getElementById('b-c2').classList.add('active');
-                document.getElementById('b-s3').classList.add('active');
-                document.querySelectorAll('#be-infra .server-node.active').forEach(n => {n.classList.remove('updating'); n.classList.add('ready');});
-                document.getElementById('b-btn-next').style.display = "none";
+        function bNext() {
+            if(bStep === 1) {
+                document.getElementById('bs1').classList.add('complete');
+                document.getElementById('bc1').classList.add('active');
+                document.getElementById('bs2').classList.add('active');
+                document.querySelectorAll('.srv-tiny.active').forEach(n => n.classList.add('updating'));
+                document.getElementById('b-next').innerText = "Verify Update";
+                addLog('b-logs', `Updating Test Instance (${bArch.toUpperCase()})...`);
+            } else if(bStep === 2) {
+                document.getElementById('bs2').classList.add('complete');
+                document.getElementById('bc2').classList.add('active');
+                document.getElementById('bs3').classList.add('active');
+                document.querySelectorAll('.srv-tiny.active').forEach(n => {n.classList.remove('updating'); n.classList.add('ready');});
+                document.getElementById('b-next').style.display = "none";
                 document.getElementById('b-choice').style.display = "flex";
-                addLog('be-logs', "Validation started (Auth / VDI Launch / Heartbeats).");
+                addLog('b-logs', "Running integrity validation...");
             }
-            beStep++;
+            bStep++;
         }
-        function beChoice(type) {
-            document.getElementById('b-s3').classList.add('complete');
+        function bFinal(t) {
+            document.getElementById('bs3').classList.add('complete');
             document.getElementById('b-dec').style.display = "flex";
             document.getElementById('b-choice').style.display = "none";
-            if(type === 'ok') {
-                addLog('be-logs', "VALIDATION OK. Applying update to Production.");
-            } else {
-                addLog('be-logs', "CRITICAL ISSUE. Rollout halted.");
-            }
+            document.getElementById(t === 'ok' ? 'bo-ok' : 'bo-fail').classList.add('active');
+            addLog('b-logs', t === 'ok' ? "VALIDATION SUCCESS. Ready for Production." : "ANOMALY DETECTED. Rollout halted.");
         }
-        function resetBeFlow() {
-            beStep = 1;
-            document.querySelectorAll('#be-flow .flow-step').forEach(s => s.classList.remove('active', 'complete', 'failed'));
-            document.querySelectorAll('#be-flow .connector').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('#be-infra .server-node').forEach(n => n.classList.remove('updating', 'ready'));
-            document.getElementById('b-s1').classList.add('active');
+        function resetBe() {
+            bStep = 1;
+            document.querySelectorAll('#bs1, #bs2, #bs3').forEach(s => s.classList.remove('active', 'complete', 'failed'));
+            document.querySelectorAll('#bc1, #bc2').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.srv-tiny').forEach(n => n.classList.remove('updating', 'ready'));
+            document.querySelectorAll('#b-dec .outcome-pill').forEach(o => o.classList.remove('active'));
+            document.getElementById('bs1').classList.add('active');
             document.getElementById('b-dec').style.display = "none";
-            document.getElementById('b-btn-next').style.display = "flex";
-            document.getElementById('b-btn-next').innerText = "Deploy to Test";
+            document.getElementById('b-next').style.display = "flex";
+            document.getElementById('b-next').innerText = "Deploy Update";
             document.getElementById('b-choice').style.display = "none";
-            document.getElementById('be-logs').innerHTML = '<div class="log-entry"><span>[SYS]</span> Backend architecture: ' + beArch.toUpperCase() + '.</div>';
+            document.getElementById('b-logs').innerHTML = '<div class="log-entry"><span>[SYS]</span> Ready for backend update.</div>';
         }
 
         /* --- Lifecycle Logic --- */
-        const nodes = [document.getElementById('un-1'), document.getElementById('un-2'), document.getElementById('un-3')];
-        function singleUninstall() {
-            nodes[1].classList.add('removed');
-            document.getElementById('un-btn-single').disabled = true;
-            addLog('un-logs', "Initiating Single Node Uninstall (NODE_B)...");
+        function doSingle() {
+            document.getElementById('u2').classList.add('removed');
+            addLog('u-logs', "Single Node Uninstall (SRV_B) initiated...");
             setTimeout(() => {
-                document.getElementById('quorum-pill').innerText = "QUORUM: MAINTAINED (2/3)";
-                document.getElementById('quorum-pill').style.color = "var(--primary)";
-                addLog('un-logs', "Integrity Verified. System online.");
+                document.getElementById('q-pill').innerText = "QUORUM: RETAINED (2/3)";
+                addLog('u-logs', "Integrity Verified. Service Online.");
+            }, 800);
+        }
+        function doAll() {
+            document.querySelectorAll('.node-card').forEach(n => n.classList.add('removed'));
+            addLog('u-logs', "CRITICAL: Cluster-Wide Uninstall triggered.");
+            setTimeout(() => {
+                document.getElementById('q-pill').innerText = "OFFLINE";
+                document.getElementById('q-pill').style.color = "var(--error)";
+                addLog('u-logs', "All node records purged. Env offline.");
             }, 1000);
         }
-        function clusterUninstall() {
-            nodes.forEach(n => n.classList.add('removed'));
-            document.getElementById('un-btn-single').disabled = true;
-            document.getElementById('un-btn-all').disabled = true;
-            addLog('un-logs', "CRITICAL: Cluster-Wide Uninstall triggered.");
-            setTimeout(() => {
-                document.getElementById('quorum-pill').innerText = "OFFLINE";
-                document.getElementById('quorum-pill').style.color = "var(--error)";
-                addLog('un-logs', "All nodes purged. Environment decommissioned.");
-            }, 1200);
-        }
-        function resetLifecycle() {
-            nodes.forEach(n => n.classList.remove('removed'));
-            document.getElementById('un-btn-single').disabled = false;
-            document.getElementById('un-btn-all').disabled = false;
-            document.getElementById('quorum-pill').innerText = "QUORUM: OK";
-            document.getElementById('quorum-pill').style.color = "var(--success)";
-            addLog('un-logs', "Environment reset. Cluster re-joined.");
+        function resetLife() {
+            document.querySelectorAll('.node-card').forEach(n => n.classList.remove('removed'));
+            document.getElementById('q-pill').innerText = "QUORUM: OK";
+            document.getElementById('q-pill').style.color = "var(--success)";
+            addLog('u-logs', "Cluster reset to baseline.");
         }
     </script>
 </body>
