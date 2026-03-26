@@ -27,357 +27,251 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
         header { 
-            height: 70px; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); 
+            height: 60px; background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); 
             display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 100;
         }
-        .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; }
+        .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; }
         .logo span { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
 
-        .nav-tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 40px; gap: 40px; }
+        .nav-tabs { display: flex; align-items: center; padding: 0 40px; gap: 30px; height: 50px; background: var(--surface); border-bottom: 1px solid var(--border); }
         .nav-btn {
-            padding: 20px 0; background: none; border: none; border-bottom: 3px solid transparent;
-            font-size: 0.8rem; font-weight: 800; color: var(--text-dim); cursor: pointer; transition: 0.2s;
+            height: 100%; background: none; border: none; border-bottom: 2px solid transparent;
+            font-size: 0.7rem; font-weight: 800; color: var(--text-dim); cursor: pointer; transition: 0.2s;
             text-transform: uppercase; letter-spacing: 1px;
         }
         .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        .main-container { flex: 1; display: flex; flex-direction: column; padding: 30px 40px; gap: 30px; overflow-y: auto; }
+        .main-container { flex: 1; display: grid; grid-template-columns: 1fr 100px 1fr; gap: 20px; padding: 20px 40px; overflow: hidden; }
         
-        .banner-note {
-            background: rgba(59, 130, 246, 0.05);
-            border: 1px dashed var(--border);
-            border-radius: 12px;
-            padding: 16px 20px;
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            line-height: 1.6;
-        }
-        .banner-note b { color: var(--text); }
+        .column { display: flex; flex-direction: column; gap: 15px; height: 100%; min-height: 0; }
 
-        .simulation-grid { display: flex; gap: 40px; align-items: stretch; position: relative; }
-
+        /* Left/Right Card Styling */
         .instance-card {
-            flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
-            padding: 30px; display: flex; flex-direction: column; gap: 24px; position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+            padding: 20px; display: flex; flex-direction: column; gap: 15px; position: relative;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5); overflow: hidden;
         }
-        .instance-card.test { border-color: rgba(156, 163, 175, 0.3); }
-        .instance-card.prod { border-color: rgba(59, 130, 246, 0.3); }
+        .instance-card.test { border-color: rgba(156, 163, 175, 0.2); }
+        .instance-card.prod { border-color: rgba(59, 130, 246, 0.2); }
 
         .card-tag {
-            position: absolute; top: -12px; left: 30px; background: var(--bg); border: 1px solid var(--border);
-            padding: 4px 16px; border-radius: 100px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            position: absolute; top: 0; left: 20px; background: var(--bg); border: 1px solid var(--border);
+            padding: 3px 12px; border-radius: 0 0 8px 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
         }
-        .prod .card-tag { border-color: var(--primary); color: var(--primary); }
+        .prod .card-tag { color: var(--primary); border-color: var(--primary); }
 
-        .track {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 16px;
-            padding: 20px; position: relative; display: flex; flex-direction: column; gap: 15px;
-        }
+        .track { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 12px; padding: 12px; position: relative; display: flex; flex-direction: column; gap: 10px; }
         .track-header { display: flex; justify-content: space-between; align-items: center; }
-        .track-title { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; }
+        .track-title { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); }
         .track-title b { color: var(--text); }
-
-        .track-visual { height: 120px; display: flex; align-items: center; justify-content: center; position: relative; }
-
-        /* Source Points */
-        .source-group {
-            position: absolute; left: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px;
-        }
-        .source-node {
-            width: 14px; height: 14px;
-            background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb);
-            border-radius: 50%; box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
-            z-index: 10;
-        }
-        .source-node.be { background: radial-gradient(circle at 30% 30%, #a78bfa, #7c3aed); box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); }
-
-        /* Small Deploy Buttons */
-        .btn-small {
-            padding: 4px 8px; font-size: 0.55rem; font-weight: 800; border-radius: 6px;
-            background: var(--primary); color: #fff; border: none; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s;
-            box-shadow: 0 0 10px var(--primary-glow);
-        }
-        .btn-small.be { background: #8b5cf6; box-shadow: 0 0 10px rgba(139, 92, 246, 0.3); }
-        .btn-small:hover:not(:disabled) { filter: brightness(1.2); transform: scale(1.05); }
-        .btn-small:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* Package Animation - FIXED Circular shape */
-        .package {
-            position: absolute; width: 14px; height: 14px; border-radius: 50%;
-            background: #fff; box-shadow: 0 0 15px #fff;
-            z-index: 20; display: none; left: 12px; top: 50%; margin-top: -7px;
-        }
-
-        .device { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 5; margin-left: auto; margin-right: 40px; }
-        .laptop { 
-            width: 100px; height: 65px; background: #1e293b; border: 3px solid #334155; border-radius: 8px; position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3); transition: 0.3s;
-        }
-        .laptop::after { content: ''; position: absolute; bottom: -8px; left: -10px; right: -10px; height: 5px; background: #334155; border-radius: 0 0 10px 10px; }
-        .screen { position: absolute; inset: 4px; background: #000; border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        
-        .v-logo { width: 30px; height: 30px; fill: var(--primary); opacity: 0.1; transition: 0.5s; }
-        .laptop.ready .v-logo { opacity: 1; filter: drop-shadow(0 0 8px var(--primary-glow)); }
-
-        .server-rack { display: flex; gap: 12px; z-index: 5; margin-left: auto; margin-right: 40px; }
-        .node {
-            width: 85px; height: 110px; background: #1e293b; border: 2px solid var(--border); border-radius: 12px;
-            display: flex; flex-direction: column; padding: 8px; gap: 6px; transition: 0.5s; position: relative;
-        }
-        .node.updating { border-color: var(--warning); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); animation: node-pulse 1.5s infinite; }
-        .node.ready { border-color: var(--success); box-shadow: 0 0 20px var(--success-glow); }
-        
-        .layer { flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; font-size: 0.5rem; font-weight: 800; display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
-        .layer.app { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
-
-        .ver { font-family: var(--mono); font-size: 0.55rem; font-weight: 700; color: var(--text-dim); }
+        .ver { font-family: var(--mono); font-size: 0.5rem; color: var(--text-dim); }
         .ver.new { color: var(--success); }
 
-        /* Gate and Validation placement */
-        .val-anchor { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 100; display: none; }
-        .gate-center { width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; padding-top: 20px; }
-        .gate-btn {
-            width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; color: var(--text-dim);
-        }
-        .gate-btn.ok:hover { border-color: var(--success); color: var(--success); box-shadow: 0 0 20px var(--success-glow); }
-        .gate-btn.fail:hover { border-color: var(--error); color: var(--error); box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
-        .gate-btn.selected.ok { background: var(--success); border-color: var(--success); color: #fff; box-shadow: 0 0 30px var(--success-glow); }
-        .gate-btn.selected.fail { background: var(--error); border-color: var(--error); color: #fff; box-shadow: 0 0 30px rgba(239, 68, 68, 0.3); }
+        .track-visual { height: 80px; display: flex; align-items: center; justify-content: center; position: relative; }
 
-        .btn-reset {
-            margin-bottom: 10px; padding: 8px 16px; background: var(--surface-light); border: 1px solid var(--border); border-radius: 8px;
-            color: var(--text); font-size: 0.7rem; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
-        }
-        .btn-reset:hover { background: var(--border); }
+        .source-group { position: absolute; left: 5px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
+        .source-node { width: 12px; height: 12px; background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb); border-radius: 50%; box-shadow: 0 0 12px rgba(59, 130, 246, 0.6); }
+        .source-node.be { background: radial-gradient(circle at 30% 30%, #a78bfa, #7c3aed); box-shadow: 0 0 12px rgba(139, 92, 246, 0.6); }
 
-        .footer-workflow {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px 35px;
-            display: flex; align-items: center; gap: 30px; box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
-        }
-        .log-display { flex: 1; height: 50px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px 20px; font-family: var(--mono); font-size: 0.75rem; overflow: hidden; display: flex; flex-direction: column; gap: 2px; }
-        .log-entry { color: var(--success); opacity: 0.9; }
-        .log-entry span { color: var(--text-dim); margin-right: 10px; }
+        .btn-small { padding: 4px 8px; font-size: 0.5rem; font-weight: 800; border-radius: 4px; background: var(--primary); color: #fff; border: none; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-small.be { background: #8b5cf6; }
+        .btn-small:hover:not(:disabled) { filter: brightness(1.2); transform: scale(1.05); }
+        .btn-small:disabled { opacity: 0.2; cursor: not-allowed; }
 
-        .btn-val {
-            padding: 8px 16px; background: var(--success); color: #fff; border: none; border-radius: 8px;
-            font-size: 0.6rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px;
-            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 0 15px var(--success-glow);
-        }
-        .btn-val .material-symbols-rounded { font-size: 18px; }
+        .package { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 12px #fff; z-index: 20; display: none; left: 10px; top: 50%; margin-top: -6px; }
 
-        /* SVG Paths fully connected */
+        .device { display: flex; flex-direction: column; align-items: center; gap: 5px; z-index: 5; margin-left: auto; margin-right: 20px; }
+        .laptop { width: 80px; height: 50px; background: #1e293b; border: 2px solid #334155; border-radius: 6px; position: relative; }
+        .laptop::after { content: ''; position: absolute; bottom: -6px; left: -8px; right: -8px; height: 4px; background: #334155; border-radius: 0 0 8px 8px; }
+        .screen { position: absolute; inset: 4px; background: #000; border-radius: 2px; display: flex; align-items: center; justify-content: center; }
+        .v-logo { width: 22px; height: 22px; fill: var(--primary); opacity: 0.1; transition: 0.5s; }
+        .laptop.ready .v-logo { opacity: 1; filter: drop-shadow(0 0 6px var(--primary-glow)); }
+
+        .server-rack { display: flex; gap: 8px; z-index: 5; margin-left: auto; margin-right: 20px; }
+        .node { width: 70px; height: 90px; background: #1e293b; border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; padding: 6px; gap: 4px; transition: 0.5s; position: relative; }
+        .node.updating { border-color: var(--warning); animation: node-pulse 1.5s infinite; }
+        .node.ready { border-color: var(--success); box-shadow: 0 0 15px var(--success-glow); }
+        .layer { flex: 1; background: rgba(255,255,255,0.03); border-radius: 3px; font-size: 0.45rem; font-weight: 800; display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
+        .layer.app { background: rgba(59, 130, 246, 0.05); color: var(--primary); }
+
+        /* Middle Controls */
+        .controls-col { justify-content: center; align-items: center; gap: 20px; }
+        .btn-reset { padding: 6px 12px; background: var(--surface-light); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.6rem; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .gate-center { display: flex; flex-direction: column; gap: 20px; opacity: 0.1; pointer-events: none; transition: 0.5s; }
+        .gate-btn { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; color: var(--text-dim); }
+        .gate-btn.ok:hover { border-color: var(--success); color: var(--success); box-shadow: 0 0 15px var(--success-glow); }
+        .gate-btn.fail:hover { border-color: var(--error); color: var(--error); }
+        .gate-btn.selected.ok { background: var(--success); border-color: var(--success); color: #fff; box-shadow: 0 0 20px var(--success-glow); }
+
+        /* Banner & Logs */
+        .top-panels { display: flex; gap: 15px; height: 80px; flex-shrink: 0; }
+        .banner-mini { flex: 1; background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--border); border-radius: 15px; padding: 12px 18px; font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; display: flex; align-items: center; }
+        .banner-mini b { color: var(--text); margin: 0 4px; }
+        
+        .logs-panel { flex: 1; background: #000; border: 1px solid var(--border); border-radius: 15px; padding: 10px 15px; display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
+        .logs-header { font-size: 0.55rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        .log-stream { flex: 1; overflow-y: hidden; font-family: var(--mono); font-size: 0.65rem; display: flex; flex-direction: column; gap: 2px; }
+        .log-line { color: var(--success); opacity: 0.8; white-space: nowrap; }
+        .log-line span { color: var(--text-dim); margin-right: 8px; }
+
+        .val-anchor { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; display: none; }
+        .btn-val { padding: 8px 16px; background: var(--success); color: #fff; border: none; border-radius: 8px; font-size: 0.65rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; text-transform: uppercase; box-shadow: 0 0 20px var(--success-glow); }
+
         .path-svg { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; }
-        line { stroke: var(--border); stroke-width: 2; stroke-dasharray: 4; }
+        line { stroke: var(--border); stroke-width: 1.5; stroke-dasharray: 4; }
         line.active { stroke: var(--primary); stroke-dasharray: 0; transition: 0.8s; }
         line.active-be { stroke: #8b5cf6; stroke-dasharray: 0; transition: 0.8s; }
 
         @keyframes node-pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 24px; }
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 18px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">VLauncher <span>Deployment Strategy — Controlled Rollout Model</span></div>
-        <div style="display: flex; gap: 20px; align-items: center;">
-            <div id="sys-stat" style="font-family: var(--mono); font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px 15px; border-radius: 100px;">
-                SYSTEM_READY // v1.2.2_STABLE
-            </div>
+        <div class="logo">VLauncher <span>Deployment Strategy</span></div>
+        <div id="sys-stat" style="font-family: var(--mono); font-size: 0.55rem; color: var(--success); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 5px 12px; border-radius: 100px;">
+            SYSTEM_READY // v1.2.2_STABLE
         </div>
     </header>
 
     <nav class="nav-tabs">
-        <button class="nav-btn active" id="tab-single" onclick="setArch('single')">Single Server Deployment</button>
-        <button class="nav-btn" id="tab-ha" onclick="setArch('ha')">Multi-Server Deployment (HA)</button>
+        <button class="nav-btn active" id="tab-single" onclick="setArch('single')">Single Server</button>
+        <button class="nav-btn" id="tab-ha" onclick="setArch('ha')">Multi-Server (HA)</button>
     </nav>
 
     <div class="main-container">
-        
-        <div class="banner-note">
-            Rollback is not introduced in GA by design. <b>VLauncher</b> validates updates in a test environment before promoting to production to ensure stability.
-        </div>
-
-        <div class="simulation-grid">
-            
+        <!-- Test Column -->
+        <div class="column">
             <div class="instance-card test">
                 <div class="card-tag">Test Instance</div>
-                
-                <!-- VAL BUTTON ANCHOR - Centered in Test Instance -->
-               <div class="val-anchor" id="val-anchor">
-                    <button class="btn-val" onclick="completeValidation()">
-                        Complete Validation <span class="material-symbols-rounded">fact_check</span>
-                    </button>
+                <div class="val-anchor" id="val-anchor">
+                    <button class="btn-val" onclick="completeValidation()">Verify Stage <span class="material-symbols-rounded">fact_check</span></button>
                 </div>
-
+                
                 <div class="track">
                     <div class="track-header">
-                        <div class="track-title">Google Admin Console — <b>Extension</b></div>
+                        <div class="track-title">Admin Console // <b>Extension</b></div>
                         <div class="ver" id="v-test-ext">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <div class="source-group" style="top: 50%; margin-top: -25px;">
+                        <div class="source-group">
                             <div class="source-node"></div>
-                            <button class="btn-small" id="btn-ext" onclick="deployExt()">Deploy Extension</button>
+                            <button class="btn-small" id="btn-ext" onclick="deployExt()">Deploy</button>
                         </div>
                         <div class="package" id="pkg-test-ext"></div>
-                        <svg class="path-svg">
-                            <!-- Adjusted x2 to end inside the laptop -->
-                            <line x1="18" y1="50%" x2="calc(100% - 90px)" y2="50%" id="l-test-ext" />
-                        </svg>
-                        <div class="device">
-                            <div class="laptop" id="lap-test">
-                                <div class="screen">
-                                    <svg class="v-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M50 5 L95 25 L95 75 L50 95 L5 75 L5 25 Z" fill="currentColor" opacity="0.2"/>
-                                        <path d="M50 20 L80 35 L80 65 L50 80 L20 65 L20 35 Z" fill="currentColor"/>
-                                        <path d="M50 35 L65 42 L65 58 L50 65 L35 58 L35 42 Z" fill="#fff"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <span style="font-size: 0.55rem; font-weight: 800; color: var(--text-dim);">Managed Device</span>
-                        </div>
+                        <svg class="path-svg"><line x1="15" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-test-ext" /></svg>
+                        <div class="device"><div class="laptop" id="lap-test"><div class="screen"><svg class="v-logo" viewBox="0 0 100 100"><path d="M50 5 L95 25 L95 75 L50 95 L5 75 L5 25 Z" fill="currentColor" opacity="0.2"/><path d="M50 20 L80 35 L80 65 L50 80 L20 65 L20 35 Z" fill="currentColor"/><path d="M50 35 L65 42 L65 58 L50 65 L35 58 L35 42 Z" fill="#fff"/></svg></div></div></div>
                     </div>
                 </div>
 
                 <div class="track">
                     <div class="track-header">
-                        <div class="track-title">AD & Windows — <b>Backend</b></div>
+                        <div class="track-title">AD & Windows // <b>Backend</b></div>
                         <div class="ver" id="v-test-be">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <div class="source-group" style="top: 50%; margin-top: -25px;">
+                        <div class="source-group">
                             <div class="source-node be"></div>
-                            <button class="btn-small be" id="btn-be" onclick="deployBE()">Deploy Backend</button>
+                            <button class="btn-small be" id="btn-be" onclick="deployBE()">Deploy</button>
                         </div>
                         <div class="package" id="pkg-test-be"></div>
-                        <svg class="path-svg">
-                            <!-- Adjusted x2 to end inside the server rack -->
-                            <line x1="18" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-test-be" />
-                        </svg>
-                        <div class="server-rack" id="rack-test">
-                            <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
-                        </div>
+                        <svg class="path-svg"><line x1="15" y1="50%" x2="calc(100% - 60px)" y2="50%" id="l-test-be" /></svg>
+                        <div class="server-rack" id="rack-test"><div class="node"><div class="layer">..</div><div class="layer app">App</div><div class="layer">DB</div><div class="layer">..</div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Controls -->
+        <div class="column controls-col">
+            <button class="btn-reset" onclick="location.reload()">Reset</button>
+            <div class="gate-center" id="gate">
+                <div class="gate-btn ok" onclick="decide('ok')"><span class="material-symbols-rounded">verified</span></div>
+                <div class="gate-btn fail" onclick="decide('fail')"><span class="material-symbols-rounded">block</span></div>
+            </div>
+        </div>
+
+        <!-- Production Column -->
+        <div class="column">
+            <div class="top-panels">
+                <div class="banner-mini">
+                    Rollback is not in GA. <b>VLauncher</b> validates in test before promoting to production.
+                </div>
+                <div class="logs-panel">
+                    <div class="logs-header">Sequence Control</div>
+                    <div class="log-stream" id="logs">
+                        <div class="log-line"><span>[SYS]</span> Console initialized. Architecture: Single.</div>
                     </div>
                 </div>
             </div>
 
-            <div class="gate-center">
-                <button class="btn-reset" onclick="location.reload()">Reset</button>
-                <div id="gate" style="opacity: 0.1; pointer-events: none; display: flex; flex-direction: column; gap: 30px;">
-                    <div class="gate-btn ok" onclick="decide('ok')">
-                        <span class="material-symbols-rounded">verified</span>
-                    </div>
-                    <div class="gate-btn fail" onclick="decide('fail')">
-                        <span class="material-symbols-rounded">block</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="instance-card prod" id="card-prod" style="opacity: 0.3;">
+            <div class="instance-card prod" id="card-prod" style="opacity: 0.15; pointer-events: none;">
                 <div class="card-tag">Production Instance</div>
-
+                
                 <div class="track">
                     <div class="track-header">
-                        <div class="track-title">Google Admin Console — <b>Extension</b></div>
+                        <div class="track-title">Admin Console // <b>Extension</b></div>
                         <div class="ver" id="v-prod-ext">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <div class="source-node" style="left: 10px; opacity: 0.3;"></div>
+                        <div class="source-node" style="left:5px; position:absolute; opacity:0.3"></div>
                         <div class="package" id="pkg-prod-ext"></div>
-                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 90px)" y2="50%" id="l-p-ext" /></svg>
-                        <div class="device">
-                            <div class="laptop" id="lap-prod">
-                                <div class="screen">
-                                    <svg class="v-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M50 5 L95 25 L95 75 L50 95 L5 75 L5 25 Z" fill="currentColor" opacity="0.2"/>
-                                        <path d="M50 20 L80 35 L80 65 L50 80 L20 65 L20 35 Z" fill="currentColor"/>
-                                        <path d="M50 35 L65 42 L65 58 L50 65 L35 58 L35 42 Z" fill="#fff"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
+                        <svg class="path-svg"><line x1="15" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-p-ext" /></svg>
+                        <div class="device"><div class="laptop" id="lap-prod"><div class="screen"><svg class="v-logo" viewBox="0 0 100 100"><path d="M50 5 L95 25 L95 75 L50 95 L5 75 L5 25 Z" fill="currentColor" opacity="0.2"/><path d="M50 20 L80 35 L80 65 L50 80 L20 65 L20 35 Z" fill="currentColor"/><path d="M50 35 L65 42 L65 58 L50 65 L35 58 L35 42 Z" fill="#fff"/></svg></div></div></div>
                     </div>
                 </div>
 
                 <div class="track">
                     <div class="track-header">
-                        <div class="track-title">AD & Windows — <b>Backend</b></div>
+                        <div class="track-title">AD & Windows // <b>Backend</b></div>
                         <div class="ver" id="v-prod-be">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <div class="source-node be" style="left: 10px; opacity: 0.3;"></div>
+                        <div class="source-node be" style="left:5px; position:absolute; opacity:0.3"></div>
                         <div class="package" id="pkg-prod-be"></div>
-                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-p-be" /></svg>
-                        <div class="server-rack" id="rack-prod">
-                            <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
-                        </div>
+                        <svg class="path-svg"><line x1="15" y1="50%" x2="calc(100% - 60px)" y2="50%" id="l-p-be" /></svg>
+                        <div class="server-rack" id="rack-prod"><div class="node"><div class="layer">..</div><div class="layer app">App</div><div class="layer">DB</div><div class="layer">..</div></div></div>
                     </div>
                 </div>
             </div>
-
         </div>
-
-        <div class="footer-workflow">
-            <div style="flex: 1;">
-                <div style="font-size: 0.7rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; text-transform: uppercase;">Sequence Control</div>
-                <div class="log-display" id="logs">
-                    <div class="log-entry"><span>[SYS]</span> Console initialized. Architecture: Single Server Deployment.</div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <script>
         let arch = 'single';
-        let extDeployed = false;
-        let beDeployed = false;
+        let extDep = false;
+        let beDep = false;
 
         function addLog(msg) {
             const entry = document.createElement('div');
-            entry.className = 'log-entry';
+            entry.className = 'log-line';
             entry.innerHTML = `<span>[LOG]</span> ${msg}`;
             const logs = document.getElementById('logs');
             logs.prepend(entry);
         }
 
         function setArch(type) {
-            if(extDeployed || beDeployed) return;
+            if(extDep || beDep) return;
             arch = type;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + type).classList.add('active');
-            
-            const rTest = document.getElementById('rack-test');
-            const rProd = document.getElementById('rack-prod');
-            
-            const nodeHTML = `<div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>`;
-            if(type === 'ha') {
-                rTest.innerHTML = nodeHTML.repeat(3);
-                rProd.innerHTML = nodeHTML.repeat(3);
-                addLog("Switched to Multi-Server Deployment (HA) configuration.");
-            } else {
-                rTest.innerHTML = nodeHTML;
-                rProd.innerHTML = nodeHTML;
-                addLog("Switched to Single Server Deployment baseline.");
-            }
+            const nodeHTML = `<div class="node"><div class="layer">..</div><div class="layer app">App</div><div class="layer">DB</div><div class="layer">..</div></div>`;
+            document.getElementById('rack-test').innerHTML = type === 'ha' ? nodeHTML.repeat(3) : nodeHTML;
+            document.getElementById('rack-prod').innerHTML = type === 'ha' ? nodeHTML.repeat(3) : nodeHTML;
+            addLog(`Switched to ${type === 'ha' ? 'Multi-Server (HA)' : 'Single Server'} configuration.`);
         }
 
         function animatePackage(pkgId, lineId, offset, onComplete) {
             const pkg = document.getElementById(pkgId);
             const line = document.getElementById(lineId);
-            
             pkg.style.display = 'block';
-            pkg.style.left = '12px';
-            
+            pkg.style.left = '10px';
             setTimeout(() => {
                 pkg.style.transition = 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-                pkg.style.left = 'calc(100% - ' + offset + 'px)';
+                pkg.style.left = `calc(100% - ${offset}px)`;
                 line.classList.add(pkgId.includes('be') ? 'active-be' : 'active');
             }, 50);
-
             setTimeout(() => {
                 pkg.style.display = 'none';
                 if(onComplete) onComplete();
@@ -387,38 +281,32 @@
         function deployExt() {
             document.getElementById('btn-ext').disabled = true;
             addLog("Pushing Extension v1.2.4 to Test OU...");
-
-            animatePackage('pkg-test-ext', 'l-test-ext', 70, () => {
+            animatePackage('pkg-test-ext', 'l-test-ext', 60, () => {
                 document.getElementById('lap-test').classList.add('ready');
                 document.getElementById('v-test-ext').innerText = 'v1.2.4-GA';
                 document.getElementById('v-test-ext').classList.add('new');
-                addLog("Extension update internalized by Managed Device.");
-                extDeployed = true;
-                checkReadyForVal();
+                extDep = true;
+                checkVal();
             });
         }
 
         function deployBE() {
             document.getElementById('btn-be').disabled = true;
-            addLog("Executing Backend rollout via AD...");
-
+            addLog("Executing Backend rollout in Test...");
             animatePackage('pkg-test-be', 'l-test-be', 50, () => {
-                const testNodes = document.querySelectorAll('#rack-test .node');
-                testNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
+                document.querySelectorAll('#rack-test .node').forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                 document.getElementById('v-test-be').innerText = 'v1.2.4-GA';
                 document.getElementById('v-test-be').classList.add('new');
-                addLog("Backend infrastructure synchronized in Test.");
-                beDeployed = true;
-                checkReadyForVal();
+                beDep = true;
+                checkVal();
             });
-            
             document.querySelectorAll('#rack-test .node').forEach(n => n.classList.add('updating'));
         }
 
-        function checkReadyForVal() {
-            if(extDeployed && beDeployed) {
+        function checkVal() {
+            if(extDep && beDep) {
                 document.getElementById('val-anchor').style.display = 'block';
-                addLog("Infrastructure staged. User validation required.");
+                addLog("Test stage aligned. Awaiting manual verification.");
             }
         }
 
@@ -426,38 +314,33 @@
             document.getElementById('val-anchor').style.display = 'none';
             document.getElementById('gate').style.opacity = '1';
             document.getElementById('gate').style.pointerEvents = 'auto';
-            addLog("Validation audit passed. Ready for Production promotion.");
+            addLog("Validation passed. Production gate opened.");
         }
 
         function decide(res) {
             document.querySelectorAll('.gate-btn').forEach(g => g.classList.remove('selected'));
             document.querySelector('.gate-btn.' + res).classList.add('selected');
             document.getElementById('gate').style.pointerEvents = 'none';
-
             if(res === 'ok') {
-                addLog("Promotion Approved. Rolling out to Production Environment...");
+                addLog("Promotion Approved. Rolling out to Production...");
                 document.getElementById('card-prod').style.opacity = '1';
-                
                 setTimeout(() => {
-                    animatePackage('pkg-prod-ext', 'l-p-ext', 70, () => {
+                    animatePackage('pkg-prod-ext', 'l-p-ext', 60, () => {
                         document.getElementById('lap-prod').classList.add('ready');
                         document.getElementById('v-prod-ext').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-ext').classList.add('new');
                     });
-
                     animatePackage('pkg-prod-be', 'l-p-be', 50, () => {
-                        const prodNodes = document.querySelectorAll('#rack-prod .node');
-                        prodNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
+                        document.querySelectorAll('#rack-prod .node').forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                         document.getElementById('v-prod-be').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-be').classList.add('new');
                         addLog("Global rollout finalized. Fleet aligned on v1.2.4.");
                         document.getElementById('sys-stat').innerText = "SYSTEM_ALIGNED // v1.2.4_GA";
                     });
-                    
                     document.querySelectorAll('#rack-prod .node').forEach(n => n.classList.add('updating'));
                 }, 500);
             } else {
-                addLog("Rollout Rejected. Production Environment remains stable.");
+                addLog("Rollout Rejected. Production remains stable.");
             }
         }
     </script>
