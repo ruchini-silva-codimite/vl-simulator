@@ -103,11 +103,11 @@
         .btn-small:hover:not(:disabled) { filter: brightness(1.2); transform: scale(1.05); }
         .btn-small:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        /* Package Animation */
+        /* Package Animation - FIXED Circular shape */
         .package {
-            position: absolute; width: 100px; height: 10px; border-radius: 50%;
-            background: #fff; box-shadow: 0 0 12px #fff;
-            z-index: 20; display: none; left: 12px; top: 50%; margin-top: -15px;
+            position: absolute; width: 14px; height: 14px; border-radius: 50%;
+            background: #fff; box-shadow: 0 0 15px #fff;
+            z-index: 20; display: none; left: 12px; top: 50%; margin-top: -7px;
         }
 
         .device { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 5; margin-left: auto; margin-right: 40px; }
@@ -371,7 +371,6 @@
             
             pkg.style.display = 'block';
             pkg.style.left = '12px';
-            pkg.style.top = 'calc(50% - 5px)';
             
             setTimeout(() => {
                 pkg.style.transition = 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
