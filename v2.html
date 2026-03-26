@@ -77,15 +77,24 @@
         }
         .source-node.be { background: radial-gradient(circle at 30% 30%, #a78bfa, #7c3aed); box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); }
 
+        /* Traveling Package */
+        .package {
+            position: absolute; width: 10px; height: 10px; border-radius: 50%;
+            background: #fff; box-shadow: 0 0 10px #fff;
+            z-index: 20; display: none;
+        }
+
         .device { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 5; }
         .laptop { 
             width: 100px; height: 65px; background: #1e293b; border: 3px solid #334155; border-radius: 8px; position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3); transition: 0.3s;
         }
         .laptop::after { content: ''; position: absolute; bottom: -8px; left: -10px; right: -10px; height: 5px; background: #334155; border-radius: 0 0 10px 10px; }
-        .screen { position: absolute; inset: 4px; background: #000; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
-        .ext-logo { width: 30px; transition: 0.5s; opacity: 0.3; }
-        .laptop.ready .ext-logo { opacity: 1; filter: drop-shadow(0 0 8px var(--primary-glow)); }
+        .screen { position: absolute; inset: 4px; background: #000; border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        
+        /* SVG Logo Replacement */
+        .v-logo { width: 30px; height: 30px; fill: var(--primary); opacity: 0.1; transition: 0.5s; }
+        .laptop.ready .v-logo { opacity: 1; filter: drop-shadow(0 0 8px var(--primary-glow)); }
 
         .server-rack { display: flex; gap: 12px; z-index: 5; }
         .node {
@@ -171,11 +180,20 @@
                         <div class="track-title">Google Admin Console — <b>Extension</b></div>
                         <div class="ver" id="v-test-ext">v1.2.2</div>
                     </div>
-                    <div class="track-visual">
-                        <div class="source-node"></div>
+                    <div class="track-visual" id="v-test-ext-visual">
+                        <div class="source-node" id="src-test-ext"></div>
+                        <div class="package" id="pkg-test-ext"></div>
                         <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-test-ext" /></svg>
                         <div class="device">
-                            <div class="laptop" id="lap-test"><div class="screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-logo"></div></div>
+                            <div class="laptop" id="lap-test">
+                                <div class="screen">
+                                    <svg class="v-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M50 5 L95 25 L95 75 L50 95 L5 75 L5 25 Z" fill="currentColor" opacity="0.2"/>
+                                        <path d="M50 20 L80 35 L80 65 L50 80 L20 65 L20 35 Z" fill="currentColor"/>
+                                        <path d="M50 35 L65 42 L65 58 L50 65 L35 58 L35 42 Z" fill="#fff"/>
+                                    </svg>
+                                </div>
+                            </div>
                             <span style="font-size: 0.55rem; font-weight: 800; color: var(--text-dim);">Managed Device</span>
                         </div>
                     </div>
@@ -186,8 +204,9 @@
                         <div class="track-title">AD & Windows — <b>Backend</b></div>
                         <div class="ver" id="v-test-be">v1.2.2</div>
                     </div>
-                    <div class="track-visual">
-                        <div class="source-node be"></div>
+                    <div class="track-visual" id="v-test-be-visual">
+                        <div class="source-node be" id="src-test-be"></div>
+                        <div class="package" id="pkg-test-be"></div>
                         <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-test-be" /></svg>
                         <div class="server-rack" id="rack-test">
                             <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
@@ -215,9 +234,18 @@
                     </div>
                     <div class="track-visual">
                         <div class="source-node" style="opacity: 0.3;"></div>
+                        <div class="package" id="pkg-prod-ext"></div>
                         <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-prod-ext" /></svg>
                         <div class="device">
-                            <div class="laptop" id="lap-prod"><div class="screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-logo"></div></div>
+                            <div class="laptop" id="lap-prod">
+                                <div class="screen">
+                                    <svg class="v-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M50 5 L95 25 L95 75 L50 95 L5 75 L5 25 Z" fill="currentColor" opacity="0.2"/>
+                                        <path d="M50 20 L80 35 L80 65 L50 80 L20 65 L20 35 Z" fill="currentColor"/>
+                                        <path d="M50 35 L65 42 L65 58 L50 65 L35 58 L35 42 Z" fill="#fff"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -229,6 +257,7 @@
                     </div>
                     <div class="track-visual">
                         <div class="source-node be" style="opacity: 0.3;"></div>
+                        <div class="package" id="pkg-prod-be"></div>
                         <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-prod-be" /></svg>
                         <div class="server-rack" id="rack-prod">
                             <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
@@ -265,7 +294,6 @@
         let arch = 'single';
         let extDeployed = false;
         let beDeployed = false;
-        let step = 1;
 
         function addLog(msg) {
             const entry = document.createElement('div');
@@ -284,51 +312,70 @@
             const rTest = document.getElementById('rack-test');
             const rProd = document.getElementById('rack-prod');
             
+            const nodeHTML = `<div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>`;
             if(type === 'ha') {
-                const nodes = `<div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>`.repeat(3);
-                rTest.innerHTML = nodes;
-                rProd.innerHTML = nodes;
+                rTest.innerHTML = nodeHTML.repeat(3);
+                rProd.innerHTML = nodeHTML.repeat(3);
                 addLog("Switched to High Availability profile.");
             } else {
-                const node = `<div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>`;
-                rTest.innerHTML = node;
-                rProd.innerHTML = node;
+                rTest.innerHTML = nodeHTML;
+                rProd.innerHTML = nodeHTML;
                 addLog("Switched to Single Server profile.");
             }
         }
 
-        function deployExt() {
-            document.getElementById('btn-ext').disabled = true;
-            document.getElementById('l-test-ext').classList.add('active');
-            addLog("Pushing Extension v1.2.4-GA to Google Admin Console...");
+        function animatePackage(pkgId, lineId, onComplete) {
+            const pkg = document.getElementById(pkgId);
+            const line = document.getElementById(lineId);
+            const x1 = 24;
+            const x2 = line.x2.baseVal.value;
+            
+            pkg.style.display = 'block';
+            pkg.style.left = x1 + 'px';
+            pkg.style.top = 'calc(50% - 5px)';
+            
+            setTimeout(() => {
+                pkg.style.transition = 'left 1s cubic-bezier(0.4, 0, 0.2, 1)';
+                pkg.style.left = 'calc(100% - ' + (pkgId.includes('ext') ? '100px' : '150px') + ')';
+                line.classList.add(pkgId.includes('be') ? 'active-be' : 'active');
+            }, 50);
 
             setTimeout(() => {
+                pkg.style.display = 'none';
+                if(onComplete) onComplete();
+            }, 1050);
+        }
+
+        function deployExt() {
+            document.getElementById('btn-ext').disabled = true;
+            addLog("Pushing Extension v1.2.4-GA to Google Admin Console...");
+
+            animatePackage('pkg-test-ext', 'l-test-ext', () => {
                 document.getElementById('lap-test').classList.add('ready');
                 document.getElementById('v-test-ext').innerText = 'v1.2.4-GA';
                 document.getElementById('v-test-ext').classList.add('new');
                 addLog("Extension update delivered to Staging OU.");
                 extDeployed = true;
                 checkReadyForVal();
-            }, 1200);
+            });
         }
 
         function deployBE() {
             document.getElementById('btn-be').disabled = true;
-            const line = document.getElementById('l-test-be');
-            line.classList.add('active-be');
-            
-            const testNodes = document.querySelectorAll('#rack-test .node');
-            testNodes.forEach(n => n.classList.add('updating'));
             addLog("Executing Backend binary rollout via AD/GPO...");
 
-            setTimeout(() => {
-                testNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
+            animatePackage('pkg-test-be', 'l-test-be', () => {
+                const testNodes = document.querySelectorAll('#rack-test .node');
+                testNodes.forEach(n => { n.classList.add('ready'); });
                 document.getElementById('v-test-be').innerText = 'v1.2.4-GA';
                 document.getElementById('v-test-be').classList.add('new');
                 addLog("Backend infrastructure updated in Staging.");
                 beDeployed = true;
                 checkReadyForVal();
-            }, 1500);
+            });
+            
+            const testNodes = document.querySelectorAll('#rack-test .node');
+            testNodes.forEach(n => n.classList.add('updating'));
         }
 
         function checkReadyForVal() {
@@ -354,23 +401,24 @@
             if(res === 'ok') {
                 addLog("Promotion Approved. Syncing Production fleet...");
                 document.getElementById('card-prod').style.opacity = '1';
+                
                 setTimeout(() => {
-                    document.getElementById('l-prod-ext').classList.add('active');
-                    document.getElementById('l-prod-be').classList.add('active-be');
-                    
-                    const prodNodes = document.querySelectorAll('#rack-prod .node');
-                    prodNodes.forEach(n => n.classList.add('updating'));
-
-                    setTimeout(() => {
+                    animatePackage('pkg-prod-ext', 'l-prod-ext', () => {
                         document.getElementById('lap-prod').classList.add('ready');
-                        prodNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                         document.getElementById('v-prod-ext').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-ext').classList.add('new');
+                    });
+
+                    animatePackage('pkg-prod-be', 'l-prod-be', () => {
+                        const prodNodes = document.querySelectorAll('#rack-prod .node');
+                        prodNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                         document.getElementById('v-prod-be').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-be').classList.add('new');
                         addLog("Global rollout finalized. All nodes synchronized.");
                         document.getElementById('sys-stat').innerText = "SYSTEM_ALIGNED // v1.2.4_GA";
-                    }, 2000);
+                    });
+                    
+                    document.querySelectorAll('#rack-prod .node').forEach(n => n.classList.add('updating'));
                 }, 500);
             } else {
                 addLog("Rollout Rejected. Production Instance stays on v1.2.2.");
