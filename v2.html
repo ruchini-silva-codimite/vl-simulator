@@ -69,6 +69,14 @@
 
         .track-visual { height: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
 
+        .source-node {
+            position: absolute; left: 10px; width: 14px; height: 14px;
+            background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb);
+            border-radius: 50%; box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            z-index: 10;
+        }
+        .source-node.be { background: radial-gradient(circle at 30% 30%, #a78bfa, #7c3aed); box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); }
+
         .device { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 5; }
         .laptop { 
             width: 100px; height: 65px; background: #1e293b; border: 3px solid #334155; border-radius: 8px; position: relative;
@@ -76,7 +84,8 @@
         }
         .laptop::after { content: ''; position: absolute; bottom: -8px; left: -10px; right: -10px; height: 5px; background: #334155; border-radius: 0 0 10px 10px; }
         .screen { position: absolute; inset: 4px; background: #000; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
-        .ext-logo { width: 30px; transition: 0.5s; }
+        .ext-logo { width: 30px; transition: 0.5s; opacity: 0.3; }
+        .laptop.ready .ext-logo { opacity: 1; filter: drop-shadow(0 0 8px var(--primary-glow)); }
 
         .server-rack { display: flex; gap: 12px; z-index: 5; }
         .node {
@@ -111,17 +120,20 @@
         .log-entry { color: var(--success); opacity: 0.9; }
         .log-entry span { color: var(--text-dim); margin-right: 10px; }
 
+        .btn-group { display: flex; gap: 15px; }
         .btn {
-            padding: 16px 32px; background: var(--primary); color: #fff; border: none; border-radius: 14px;
-            font-size: 0.85rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            padding: 16px 24px; background: var(--primary); color: #fff; border: none; border-radius: 14px;
+            font-size: 0.75rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px;
             transition: 0.3s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px var(--primary-glow);
         }
         .btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; transform: none; }
+        .btn.secondary { background: #8b5cf6; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
 
         .path-svg { position: absolute; inset: 0; pointer-events: none; }
         line { stroke: var(--border); stroke-width: 2; stroke-dasharray: 6; }
         line.active { stroke: var(--primary); stroke-dasharray: 0; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        line.active-be { stroke: #8b5cf6; stroke-dasharray: 0; transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
 
         @keyframes node-pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
@@ -160,10 +172,10 @@
                         <div class="ver" id="v-test-ext">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <span class="material-symbols-rounded" style="position: absolute; left: 10px; color: var(--primary); opacity: 0.4;">send</span>
-                        <svg class="path-svg"><line x1="40" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-test-ext" /></svg>
+                        <div class="source-node"></div>
+                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-test-ext" /></svg>
                         <div class="device">
-                            <div class="laptop"><div class="screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-logo"></div></div>
+                            <div class="laptop" id="lap-test"><div class="screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-logo"></div></div>
                             <span style="font-size: 0.55rem; font-weight: 800; color: var(--text-dim);">Managed Device</span>
                         </div>
                     </div>
@@ -175,8 +187,8 @@
                         <div class="ver" id="v-test-be">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <span class="material-symbols-rounded" style="position: absolute; left: 10px; color: #8b5cf6; opacity: 0.4;">layers</span>
-                        <svg class="path-svg"><line x1="40" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-test-be" /></svg>
+                        <div class="source-node be"></div>
+                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-test-be" /></svg>
                         <div class="server-rack" id="rack-test">
                             <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
                         </div>
@@ -202,9 +214,10 @@
                         <div class="ver" id="v-prod-ext">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <svg class="path-svg"><line x1="20" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-prod-ext" /></svg>
+                        <div class="source-node" style="opacity: 0.3;"></div>
+                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-prod-ext" /></svg>
                         <div class="device">
-                            <div class="laptop"><div class="screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-logo"></div></div>
+                            <div class="laptop" id="lap-prod"><div class="screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-logo"></div></div>
                         </div>
                     </div>
                 </div>
@@ -215,7 +228,8 @@
                         <div class="ver" id="v-prod-be">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <svg class="path-svg"><line x1="20" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-prod-be" /></svg>
+                        <div class="source-node be" style="opacity: 0.3;"></div>
+                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-prod-be" /></svg>
                         <div class="server-rack" id="rack-prod">
                             <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
                         </div>
@@ -232,8 +246,16 @@
                     <div class="log-entry"><span>[SYS]</span> Console initialized. Architecture: Single Server.</div>
                 </div>
             </div>
-            <button class="btn" id="btn-main" onclick="runWorkflow()">
-                Stage v1.2.4 Update <span class="material-symbols-rounded">rocket_launch</span>
+            <div class="btn-group" id="main-btns">
+                <button class="btn" id="btn-ext" onclick="deployExt()">
+                    Deploy Extension <span class="material-symbols-rounded">chrome_reader_mode</span>
+                </button>
+                <button class="btn secondary" id="btn-be" onclick="deployBE()">
+                    Deploy Backend <span class="material-symbols-rounded">terminal</span>
+                </button>
+            </div>
+            <button class="btn" id="btn-val" style="display: none; background: var(--success); box-shadow: 0 4px 15px var(--success-glow);" onclick="completeValidation()">
+                Complete Validation <span class="material-symbols-rounded">fact_check</span>
             </button>
         </div>
 
@@ -241,6 +263,8 @@
 
     <script>
         let arch = 'single';
+        let extDeployed = false;
+        let beDeployed = false;
         let step = 1;
 
         function addLog(msg) {
@@ -252,7 +276,7 @@
         }
 
         function setArch(type) {
-            if(step > 1) return;
+            if(extDeployed || beDeployed) return;
             arch = type;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + type).classList.add('active');
@@ -264,7 +288,7 @@
                 const nodes = `<div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>`.repeat(3);
                 rTest.innerHTML = nodes;
                 rProd.innerHTML = nodes;
-                addLog("Switched to High Availability (3-Node) profile.");
+                addLog("Switched to High Availability profile.");
             } else {
                 const node = `<div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>`;
                 rTest.innerHTML = node;
@@ -273,34 +297,53 @@
             }
         }
 
-        function runWorkflow() {
-            if(step === 1) {
-                document.getElementById('btn-main').disabled = true;
-                document.getElementById('l-test-ext').classList.add('active');
-                document.getElementById('l-test-be').classList.add('active');
-                
-                const testNodes = document.querySelectorAll('#rack-test .node');
-                testNodes.forEach(n => n.classList.add('updating'));
-                addLog("Pushing v1.2.4-GA to Test Instances...");
+        function deployExt() {
+            document.getElementById('btn-ext').disabled = true;
+            document.getElementById('l-test-ext').classList.add('active');
+            addLog("Pushing Extension v1.2.4-GA to Google Admin Console...");
 
-                setTimeout(() => {
-                    testNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
-                    document.getElementById('v-test-ext').innerText = 'v1.2.4-GA';
-                    document.getElementById('v-test-ext').classList.add('new');
-                    document.getElementById('v-test-be').innerText = 'v1.2.4-GA';
-                    document.getElementById('v-test-be').classList.add('new');
-                    
-                    addLog("Validation required: Audit Extension & Backend behavior.");
-                    document.getElementById('btn-main').disabled = false;
-                    document.getElementById('btn-main').innerHTML = `Complete Validation <span class="material-symbols-rounded">fact_check</span>`;
-                    step = 2;
-                }, 2000);
-            } else if(step === 2) {
-                document.getElementById('gate').style.opacity = '1';
-                document.getElementById('gate').style.pointerEvents = 'auto';
-                document.getElementById('btn-main').style.display = 'none';
-                addLog("Validation complete. Awaiting user decision gate.");
+            setTimeout(() => {
+                document.getElementById('lap-test').classList.add('ready');
+                document.getElementById('v-test-ext').innerText = 'v1.2.4-GA';
+                document.getElementById('v-test-ext').classList.add('new');
+                addLog("Extension update delivered to Staging OU.");
+                extDeployed = true;
+                checkReadyForVal();
+            }, 1200);
+        }
+
+        function deployBE() {
+            document.getElementById('btn-be').disabled = true;
+            const line = document.getElementById('l-test-be');
+            line.classList.add('active-be');
+            
+            const testNodes = document.querySelectorAll('#rack-test .node');
+            testNodes.forEach(n => n.classList.add('updating'));
+            addLog("Executing Backend binary rollout via AD/GPO...");
+
+            setTimeout(() => {
+                testNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
+                document.getElementById('v-test-be').innerText = 'v1.2.4-GA';
+                document.getElementById('v-test-be').classList.add('new');
+                addLog("Backend infrastructure updated in Staging.");
+                beDeployed = true;
+                checkReadyForVal();
+            }, 1500);
+        }
+
+        function checkReadyForVal() {
+            if(extDeployed && beDeployed) {
+                document.getElementById('main-btns').style.display = 'none';
+                document.getElementById('btn-val').style.display = 'flex';
+                addLog("Update staged. Proceed to behavioral validation.");
             }
+        }
+
+        function completeValidation() {
+            document.getElementById('btn-val').style.display = 'none';
+            document.getElementById('gate').style.opacity = '1';
+            document.getElementById('gate').style.pointerEvents = 'auto';
+            addLog("Validation audit finished. Decision required.");
         }
 
         function decide(res) {
@@ -309,26 +352,28 @@
             document.getElementById('gate').style.pointerEvents = 'none';
 
             if(res === 'ok') {
-                addLog("Promotion Approved. Rolling out to Production Instance...");
+                addLog("Promotion Approved. Syncing Production fleet...");
                 document.getElementById('card-prod').style.opacity = '1';
                 setTimeout(() => {
                     document.getElementById('l-prod-ext').classList.add('active');
-                    document.getElementById('l-prod-be').classList.add('active');
+                    document.getElementById('l-prod-be').classList.add('active-be');
+                    
                     const prodNodes = document.querySelectorAll('#rack-prod .node');
                     prodNodes.forEach(n => n.classList.add('updating'));
 
                     setTimeout(() => {
+                        document.getElementById('lap-prod').classList.add('ready');
                         prodNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                         document.getElementById('v-prod-ext').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-ext').classList.add('new');
                         document.getElementById('v-prod-be').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-be').classList.add('new');
-                        addLog("Rollout Successful. Fleet is synchronized on v1.2.4-GA.");
+                        addLog("Global rollout finalized. All nodes synchronized.");
                         document.getElementById('sys-stat').innerText = "SYSTEM_ALIGNED // v1.2.4_GA";
                     }, 2000);
                 }, 500);
             } else {
-                addLog("Rollout Rejected. Production Instance remains stable on v1.2.2.");
+                addLog("Rollout Rejected. Production Instance stays on v1.2.2.");
             }
         }
     </script>
