@@ -49,12 +49,13 @@
         .scenario-info h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
         .scenario-info p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; max-width: 600px; }
 
-        .viz-container { flex: 1; position: relative; padding: 40px; overflow: hidden; }
+        .viz-container { flex: 1; position: relative; padding: 40px; display: flex; flex-direction: column; align-items: center; }
 
-        /* Infrastructure Positioning */
-        .lb-anchor { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); z-index: 10; }
-        .ext-anchor { position: absolute; bottom: 60px; left: 80px; z-index: 10; }
-        .cluster-anchor { position: absolute; bottom: 60px; right: 60px; z-index: 10; }
+        /* Row 1: Load Balancer */
+        .lb-row { width: 100%; display: flex; justify-content: center; margin-bottom: 80px; z-index: 10; }
+        
+        /* Row 2: Extension and Backend */
+        .bottom-row { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; padding: 0 20px; z-index: 10; }
 
         .infra-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         
@@ -68,16 +69,16 @@
         .laptop.disconnected .v-logo { fill: var(--text-dim); opacity: 0.1; filter: none; }
 
         .lb-unit {
-            width: 110px; height: 50px; background: #334155; border: 2px solid #475569; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            width: 120px; height: 55px; background: #334155; border: 2px solid #475569; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
         }
-        .lb-led { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success-glow); }
+        .lb-led { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success-glow); }
         .lb-led.off { background: #1e293b; box-shadow: none; }
 
         .cluster-rack { display: flex; gap: 20px; border: 1px dashed rgba(255,255,255,0.1); padding: 25px; border-radius: 24px; background: rgba(255,255,255,0.02); }
         .node {
-            width: 105px; height: 140px; background: #1e293b; border: 2px solid var(--success); border-radius: 16px;
+            width: 110px; height: 145px; background: #1e293b; border: 2px solid var(--success); border-radius: 16px;
             display: flex; flex-direction: column; padding: 12px; gap: 8px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative; box-shadow: 0 0 25px var(--success-glow);
         }
@@ -88,37 +89,10 @@
         .layer { flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px; font-size: 0.6rem; font-weight: 800; display: flex; align-items: center; justify-content: center; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.05); }
         .layer.app { background: rgba(59, 130, 246, 0.1); color: var(--primary); border-color: rgba(59, 130, 246, 0.2); }
 
-        /* Elbow Connectors */
+        /* Connectors */
         .flow-svg { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; z-index: 1; }
-        path { fill: none; stroke: var(--success); stroke-width: 2.5; transition: 0.8s; stroke-dasharray: 0; opacity: 0.5; stroke-linecap: round; stroke-linejoin: round; }
+        path { fill: none; stroke: var(--success); stroke-width: 2.5; transition: 0.8s; stroke-dasharray: 0; opacity: 0.6; stroke-linecap: round; stroke-linejoin: round; }
         path.dead { stroke: var(--border); stroke-dasharray: 6; opacity: 0.1; }
-
-        /* Sidebar & Controls */
-        .sidebar { display: flex; flex-direction: column; gap: 25px; }
-        .control-card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 25px;
-            display: flex; flex-direction: column; gap: 20px;
-        }
-        .card-title { font-size: 0.75rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; }
-        
-        .btn-action {
-            width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--border);
-            background: var(--surface-light); color: var(--text); font-size: 0.8rem; font-weight: 700;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
-        }
-        .btn-action:hover:not(:disabled) { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
-        .btn-action.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
-        .btn-action.danger:hover:not(:disabled) { border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
-        .btn-action .icon { width: 32px; height: 32px; border-radius: 10px; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
-
-        .btn-execute {
-            width: 100%; padding: 18px; border-radius: 16px; border: none;
-            background: var(--error); color: #fff; font-size: 0.85rem; font-weight: 800;
-            cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 10px 30px var(--error-glow);
-        }
-        .btn-execute:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 15px 40px var(--error-glow); }
-        .btn-execute:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .logs-card { height: 260px; background: #000; border: 1px solid var(--border); border-radius: 24px; padding: 20px 25px; display: flex; flex-direction: column; gap: 15px; }
         .log-container { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
@@ -160,9 +134,8 @@
             </div>
 
             <div class="viz-container">
-                <!-- Load Balancer at Top Center -->
-                <div class="lb-anchor">
-                    <div class="infra-group">
+                <div class="lb-row">
+                    <div class="infra-group" id="lb-grp">
                         <div class="lb-unit" id="lb">
                             <div class="lb-led" id="led1"></div>
                             <div class="lb-led" id="led2"></div>
@@ -172,9 +145,8 @@
                     </div>
                 </div>
 
-                <!-- Extension Interface at Bottom Left -->
-                <div class="ext-anchor">
-                    <div class="infra-group">
+                <div class="bottom-row">
+                    <div class="infra-group" id="ext-grp" style="margin-left: 20px;">
                         <div class="laptop" id="lap">
                             <div class="screen">
                                 <svg class="v-logo" viewBox="0 0 100 100">
@@ -186,44 +158,37 @@
                         </div>
                         <span style="font-size: 0.6rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase;">Extension Interface</span>
                     </div>
-                </div>
 
-                <!-- Backend Cluster at Bottom Right -->
-                <div class="cluster-anchor">
-                    <div class="cluster-rack">
-                        <div class="node" id="n1">
-                            <div class="node-label">Server 01</div>
-                            <div class="layer app">Application</div>
-                            <div class="layer">Database</div>
-                            <div class="layer">Active</div>
+                    <div class="infra-group" id="be-grp" style="margin-right: 20px;">
+                        <div class="cluster-rack">
+                            <div class="node" id="n1">
+                                <div class="node-label">Server 01</div>
+                                <div class="layer app">Application</div>
+                                <div class="layer">Database</div>
+                                <div class="layer">Active</div>
+                            </div>
+                            <div class="node" id="n2">
+                                <div class="node-label">Server 02</div>
+                                <div class="layer app">Application</div>
+                                <div class="layer">Database</div>
+                                <div class="layer">Active</div>
+                            </div>
+                            <div class="node" id="n3">
+                                <div class="node-label">Server 03</div>
+                                <div class="layer app">Application</div>
+                                <div class="layer">Database</div>
+                                <div class="layer">Active</div>
+                            </div>
                         </div>
-                        <div class="node" id="n2">
-                            <div class="node-label">Server 02</div>
-                            <div class="layer app">Application</div>
-                            <div class="layer">Database</div>
-                            <div class="layer">Active</div>
-                        </div>
-                        <div class="node" id="n3">
-                            <div class="node-label">Server 03</div>
-                            <div class="layer app">Application</div>
-                            <div class="layer">Database</div>
-                            <div class="layer">Active</div>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 10px;">
                         <span style="font-size: 0.6rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase;">Windows Server Backend</span>
                     </div>
                 </div>
 
-                <!-- Elbow Connectors -->
-                <svg class="flow-svg">
-                    <!-- Path from LB to Extension -->
-                    <path id="l-ext" d="M 460 65 L 150 65 L 150 250" />
-                    
-                    <!-- Path from LB to Nodes -->
-                    <path id="l1" d="M 580 65 L 755 65 L 755 240" />
-                    <path id="l2" d="M 580 65 L 880 65 L 880 240" />
-                    <path id="l3" d="M 580 65 L 1005 65 L 1005 240" />
+                <svg class="flow-svg" id="svg-root">
+                    <path id="l-ext" d="" />
+                    <path id="l1" d="" />
+                    <path id="l2" d="" />
+                    <path id="l3" d="" />
                 </svg>
             </div>
         </div>
@@ -268,13 +233,43 @@
         let mode = 'single';
         let busy = false;
 
+        function updateConnectors() {
+            const svg = document.getElementById('svg-root').getBoundingClientRect();
+            const lb = document.getElementById('lb').getBoundingClientRect();
+            const lap = document.getElementById('lap').getBoundingClientRect();
+            const n1 = document.getElementById('n1').getBoundingClientRect();
+            const n2 = document.getElementById('n2').getBoundingClientRect();
+            const n3 = document.getElementById('n3').getBoundingClientRect();
+
+            const lbX = lb.left + lb.width/2 - svg.left;
+            const lbY = lb.top + lb.height/2 - svg.top;
+
+            // To Extension
+            const extX = lap.left + lap.width/2 - svg.left;
+            const extY = lap.top - svg.top;
+            document.getElementById('l-ext').setAttribute('d', `M ${lbX} ${lbY} L ${extX} ${lbY} L ${extX} ${extY}`);
+
+            // To Nodes
+            const drawNodePath = (id, el) => {
+                const nX = el.left + el.width/2 - svg.left;
+                const nY = el.top - svg.top;
+                document.getElementById(id).setAttribute('d', `M ${lbX} ${lbY} L ${nX} ${lbY} L ${nX} ${nY}`);
+            };
+
+            drawNodePath('l1', n1);
+            drawNodePath('l2', n2);
+            drawNodePath('l3', n3);
+        }
+
+        window.onload = updateConnectors;
+        window.onresize = updateConnectors;
+
         function addLog(msg, type = 'err') {
             const list = document.getElementById('log-list');
             const item = document.createElement('div');
             item.className = 'log-item' + (type === 'sys' ? ' sys' : '');
             item.innerHTML = `<span>${new Date().toLocaleTimeString([], {hour12: false})}</span> ${msg}`;
             list.appendChild(item);
-            
             const container = document.getElementById('log-container');
             container.scrollTop = container.scrollHeight;
         }
@@ -284,10 +279,8 @@
             mode = s;
             document.querySelectorAll('.btn-action').forEach(b => b.classList.remove('active'));
             document.getElementById('opt-' + s).classList.add('active');
-            
             const title = document.getElementById('scenario-title');
             const desc = document.getElementById('scenario-desc');
-            
             if(s === 'cluster') {
                 title.innerText = "Cluster-Wide Uninstallation";
                 desc.innerText = "Full cluster teardown. All nodes will be decommissioned simultaneously, purging the shared database and dismantling the Windows Server infrastructure.";
@@ -303,62 +296,48 @@
             busy = true;
             document.getElementById('btn-run').disabled = true;
             document.querySelectorAll('.btn-action').forEach(b => b.disabled = true);
-
-            if(mode === 'single') {
-                await runSingle();
-            } else {
-                await runCluster();
-            }
+            if(mode === 'single') await runSingle();
+            else await runCluster();
         }
 
         async function runSingle() {
             addLog("<b>Initiating:</b> Uninstalling VLauncher from Server 01...");
             document.getElementById('n1').classList.add('uninstalling');
-            
             await wait(1500);
             addLog("<b>LB:</b> Draining traffic from Server 01. Redirecting to 02 and 03...");
             document.getElementById('l1').classList.add('dead');
             document.getElementById('led1').classList.add('off');
-            
             await wait(1200);
             addLog("<b>Cluster:</b> Notifying quorum members of intent to leave...");
-            
             await wait(1000);
             addLog("<b>Database:</b> Node 01 membership purged successfully.", 'sys');
             document.getElementById('n1').classList.remove('uninstalling');
             document.getElementById('n1').classList.add('removed');
-            
             document.getElementById('global-status').innerText = "STATUS: DEGRADED (2/3)";
             document.getElementById('global-status').style.color = "var(--warning)";
             document.getElementById('global-status').style.background = "rgba(245, 158, 11, 0.1)";
-            
             addLog("<b>Result:</b> Server 01 removed. System remains ONLINE via Server 02/03.", 'sys');
         }
 
         async function runCluster() {
             addLog("<b>CRITICAL:</b> Starting full cluster decommissioning sequence...");
             document.querySelectorAll('.node').forEach(n => n.classList.add('uninstalling'));
-            
             await wait(1800);
             addLog("<b>LB:</b> Cutting all incoming extension traffic...");
             document.getElementById('l-ext').classList.add('dead');
             document.querySelectorAll('.lb-led').forEach(l => l.classList.add('off'));
-            
             await wait(1200);
             document.querySelectorAll('path').forEach(l => l.classList.add('dead'));
             addLog("<b>Windows Server:</b> Dismantling backend services on all nodes...");
-            
             await wait(1500);
             document.querySelectorAll('.node').forEach(n => {
                 n.classList.remove('uninstalling');
                 n.classList.add('removed');
             });
             document.getElementById('lap').classList.add('disconnected');
-            
             document.getElementById('global-status').innerText = "STATUS: DECOMMISSIONED";
             document.getElementById('global-status').style.color = "var(--text-dim)";
             document.getElementById('global-status').style.background = "rgba(148, 163, 184, 0.1)";
-            
             addLog("<b>Purge:</b> Shared cluster database and logs wiped.");
             addLog("<b>Success:</b> Backend infrastructure dismantled. System is OFFLINE.", 'sys');
         }
