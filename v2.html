@@ -3,393 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VLauncher Architecture Studio v2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>VLauncher Mission Control v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <style>
         :root {
-            --bg: #030712;
-            --surface: #0f172a;
-            --surface-light: #1e293b;
-            --border: #334155;
+            --bg: #020617;
+            --card: #0f172a;
+            --border: #1e293b;
             --primary: #3b82f6;
             --primary-glow: rgba(59, 130, 246, 0.4);
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
-            --text: #f1f5f9;
-            --text-dim: #94a3b8;
+            --text: #f8fafc;
+            --text-dim: #64748b;
             --mono: 'JetBrains Mono', monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        /* --- Tabs Navigation --- */
-        .tab-nav {
-            display: flex; gap: 4px; padding: 15px 30px 0; background: var(--bg); border-bottom: 1px solid var(--border);
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 80px; background: #000; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 30px;
         }
-        .tab-btn {
-            padding: 10px 20px; background: transparent; border: none; color: var(--text-dim); cursor: pointer;
-            font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px 10px 0 0;
-            transition: 0.2s; position: relative;
+        .nav-item {
+            width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; color: var(--text-dim);
         }
-        .tab-btn.active { color: var(--primary); background: var(--surface); }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--primary); }
+        .nav-item:hover { background: var(--card); color: var(--text); }
+        .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 0 15px var(--primary-glow); }
 
-        .tab-content { display: none; flex: 1; padding: 30px; overflow-y: auto; }
-        .tab-content.active { display: flex; flex-direction: column; gap: 20px; }
+        /* --- Main Dashboard --- */
+        .dashboard { flex: 1; display: flex; flex-direction: column; }
+        .header { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 30px; justify-content: space-between; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(10px); z-index: 10; }
+        .status-badge { display: flex; align-items: center; gap: 8px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--success); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite; }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
-        .card {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px;
-            display: flex; flex-direction: column; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* --- COMPACT FLOW ENGINE --- */
-        .flow-container { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
+        /* --- Layout Grid --- */
+        .main-stage { flex: 1; display: flex; overflow: hidden; }
         
-        .node-pill {
-            width: 100%; max-width: 240px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border);
-            background: var(--surface-light); display: flex; align-items: center; gap: 10px; font-size: 0.7rem; font-weight: 700;
-            transition: 0.3s; position: relative;
-        }
-        .node-pill i { font-size: 16px; opacity: 0.5; }
-        .node-pill.active { border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); color: var(--primary); }
-        .node-pill.active i { opacity: 1; color: var(--primary); }
-        .node-pill.complete { border-color: var(--success); color: var(--success); }
-        .node-pill.complete i { opacity: 1; color: var(--success); }
-        .node-pill.failed { border-color: var(--error); color: var(--error); }
-        .node-pill.failed i { opacity: 1; color: var(--error); }
+        /* Left Panel: Visual Stage */
+        .visual-stage { flex: 1; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 30px 30px; position: relative; display: flex; align-items: center; justify-content: center; }
+
+        /* Right Panel: Command Center */
+        .command-center { width: 350px; background: var(--card); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; }
+
+        /* --- Components --- */
+        .stage-view { position: absolute; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; transition: 0.5s; opacity: 0; }
+        .stage-view.active { display: flex; opacity: 1; }
+
+        /* GAC Visuals */
+        .cloud-hub { width: 120px; height: 120px; background: rgba(59, 130, 246, 0.1); border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 80px; box-shadow: 0 0 30px var(--primary-glow); }
+        .cloud-hub i { font-size: 48px; color: var(--primary); }
+        .ou-container { display: flex; gap: 100px; position: relative; }
+        .ou-node { width: 140px; height: 100px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; position: relative; transition: 0.3s; }
+        .ou-node.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.05); }
+        .ou-node.updated { border-color: var(--success); }
+        .ou-label { font-size: 0.6rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; }
         
-        .connector-sm { width: 2px; height: 10px; background: var(--border); }
-        .connector-sm.active { background: var(--primary); }
+        .package { width: 40px; height: 40px; background: var(--primary); border-radius: 8px; position: absolute; top: 60px; left: calc(50% - 20px); display: none; align-items: center; justify-content: center; color: #fff; z-index: 5; box-shadow: 0 0 20px var(--primary-glow); }
 
-        .decision-compact { 
-            display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 5px; padding-top: 10px;
-            border-top: 1px dashed var(--border);
+        /* Infrastructure Visuals */
+        .infra-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; }
+        .server { width: 100px; height: 130px; background: var(--card); border: 2px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transition: 0.5s; position: relative; }
+        .server.active { border-color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); }
+        .server.updating { border-color: var(--warning); animation: update-spin 1.5s infinite; }
+        .server.ready { border-color: var(--success); box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+        .server-lights { display: flex; gap: 4px; margin-top: 10px; }
+        .light { width: 4px; height: 4px; border-radius: 50%; background: var(--success); }
+
+        /* --- UI Elements --- */
+        .control-group { margin-bottom: 24px; }
+        .label-sm { font-size: 0.65rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 12px; display: block; }
+        
+        .action-card { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+        .action-card:hover { border-color: var(--primary); background: rgba(59, 130, 246, 0.05); }
+        .action-card.disabled { opacity: 0.3; cursor: not-allowed; }
+        .action-card h4 { font-size: 0.75rem; margin-bottom: 4px; }
+        .action-card p { font-size: 0.65rem; color: var(--text-dim); line-height: 1.4; }
+
+        .log-panel { flex: 1; background: #000; border-radius: 12px; border: 1px solid var(--border); padding: 15px; font-family: var(--mono); font-size: 0.65rem; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; }
+        .log-row { color: #4ade80; opacity: 0.8; line-height: 1.5; }
+        .log-row span { color: var(--text-dim); margin-right: 8px; }
+
+        .btn { width: 100%; padding: 12px; background: var(--primary); border: none; border-radius: 10px; color: #fff; font-weight: 700; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+        .note-bubble { margin-top: 20px; padding: 12px; border-radius: 10px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); font-size: 0.7rem; line-height: 1.5; color: var(--text-dim); }
+
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 20px; }
+
+        /* Mobile / Small screen note */
+        @media (max-width: 1024px) {
+            .command-center { width: 280px; }
         }
-        .outcome-pill {
-            flex: 1; max-width: 140px; padding: 8px; border-radius: 8px; border: 1px solid var(--border);
-            font-size: 0.6rem; text-align: center; font-weight: 800; opacity: 0.3; transition: 0.3s;
-            display: flex; flex-direction: column; gap: 4px;
-        }
-        .outcome-pill.active { opacity: 1; border-color: inherit; background: rgba(255,255,255,0.05); }
-        .outcome-pill.ok { border-color: var(--success); color: var(--success); }
-        .outcome-pill.fail { border-color: var(--error); color: var(--error); }
-
-        /* --- Infrastructure Visuals --- */
-        .infra-mini {
-            height: 80px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed var(--border);
-            display: flex; align-items: center; justify-content: space-around; padding: 10px; margin-bottom: 15px;
-        }
-        .srv-tiny { display: flex; flex-direction: column; align-items: center; gap: 5px; opacity: 0.2; transition: 0.5s; }
-        .srv-tiny.active { opacity: 1; }
-        .srv-box { width: 28px; height: 35px; background: #1e293b; border: 1.5px solid var(--border); border-radius: 4px; position: relative; }
-        .srv-tiny.updating .srv-box { border-color: var(--warning); box-shadow: 0 0 8px var(--warning); }
-        .srv-tiny.ready .srv-box { border-color: var(--success); box-shadow: 0 0 8px var(--success); }
-        .srv-label { font-size: 0.5rem; font-family: var(--mono); color: var(--text-dim); }
-
-        /* --- Lifecycle Visual --- */
-        .cluster-compact { display: flex; justify-content: center; gap: 15px; padding: 15px; }
-        .node-card {
-            width: 75px; height: 90px; background: #1e293b; border: 2px solid var(--primary); border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; transition: 0.5s;
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-        .node-card.removed { transform: scale(0.6); opacity: 0; filter: blur(4px); }
-        .status-led-sm { width: 5px; height: 5px; border-radius: 50%; background: var(--success); box-shadow: 0 0 5px var(--success); }
-
-        /* --- Logs & UI --- */
-        .log-compact {
-            height: 70px; background: #000; border-radius: 10px; padding: 10px; font-family: var(--mono); font-size: 0.65rem; overflow: hidden;
-            display: flex; flex-direction: column; gap: 3px; border: 1px solid var(--border); margin-top: 10px;
-        }
-        .log-entry { color: #4ade80; opacity: 0.7; }
-        .log-entry span { color: var(--text-dim); margin-right: 6px; }
-
-        .note-p { background: rgba(59, 130, 246, 0.05); border-radius: 12px; padding: 12px; font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; }
-
-        .controls { display: flex; gap: 8px; margin-top: auto; }
-        .btn-sm {
-            flex: 1; background: var(--surface-light); border: 1px solid var(--border); padding: 8px; border-radius: 8px;
-            color: var(--text); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s;
-        }
-        .btn-sm:hover:not(:disabled) { background: #334155; }
-        .btn-sm.primary { background: var(--primary); border: none; }
-        .btn-sm.danger { color: var(--error); border-color: rgba(239, 68, 68, 0.2); }
-        .btn-sm:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        .badge-sm { font-size: 0.45rem; font-weight: 900; background: var(--warning); color: #000; padding: 1px 4px; border-radius: 3px; margin-left: auto; }
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 16px; }
     </style>
 </head>
 <body>
 
-    <nav class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('rollout', this)">Controlled Rollout</button>
-        <button class="tab-btn" onclick="switchTab('lifecycle', this)">Lifecycle Management</button>
-    </nav>
+    <aside class="sidebar">
+        <div class="nav-item active" onclick="setTab('update', this)" title="Update Pipeline"><span class="material-symbols-rounded">rocket_launch</span></div>
+        <div class="nav-item" onclick="setTab('uninstall', this)" title="Lifecycle Management"><span class="material-symbols-rounded">delete_sweep</span></div>
+        <div style="margin-top: auto;" class="nav-item" onclick="resetAll()"><span class="material-symbols-rounded">refresh</span></div>
+    </aside>
 
-    <!-- Tab 1: Controlled Rollout -->
-    <div id="tab-rollout" class="tab-content active">
-        <div class="grid-2">
-            
-            <!-- Google Admin Console -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title"><span class="material-symbols-rounded">settings_ethernet</span> GAC Pipeline</div>
-                    <button class="btn-sm" style="width: 32px; flex: none;" onclick="resetGac()"><span class="material-symbols-rounded">refresh</span></button>
-                </div>
+    <main class="dashboard">
+        <header class="header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="font-weight: 800; font-size: 1rem; letter-spacing: -0.5px;">VLAUNCHER <span style="color: var(--primary);">STUDIO v2</span></span>
+                <span style="background: var(--border); padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-family: var(--mono);">BUILD_26.03_GA</span>
+            </div>
+            <div class="status-badge"><div class="status-dot"></div> <span id="global-status">SYSTEM_NOMINAL</span></div>
+        </header>
 
-                <div class="flow-container">
-                    <div class="node-pill active" id="gs1"><i class="material-symbols-rounded">extension</i> Extension Update <span class="badge-sm">CRX</span></div>
-                    <div class="connector-sm" id="gc1"></div>
-                    <div class="node-pill" id="gs2"><i class="material-symbols-rounded">science</i> Deploy to Test OU</div>
-                    <div class="connector-sm" id="gc2"></div>
-                    <div class="node-pill" id="gs3"><i class="material-symbols-rounded">verified_user</i> Validate Behavior</div>
-                    
-                    <div class="decision-compact" id="g-dec" style="display: none;">
-                        <div class="outcome-pill ok" id="go-ok">
-                            <span style="font-size: 0.5rem; opacity: 0.6;">PROD OU</span>
-                            Unpin & Deploy
+        <section class="main-stage">
+            <!-- Visual Stage (Center) -->
+            <div class="visual-stage">
+                
+                <!-- Update Pipeline View -->
+                <div id="view-update" class="stage-view active">
+                    <div class="cloud-hub">
+                        <i class="material-symbols-rounded">cloud_download</i>
+                        <div id="pkg-node" class="package"><span class="material-symbols-rounded">package_2</span></div>
+                    </div>
+                    <div class="ou-container">
+                        <div class="ou-node" id="ou-test">
+                            <i class="material-symbols-rounded" style="font-size: 24px; color: var(--text-dim);">science</i>
+                            <span class="ou-label">Test OU</span>
+                            <div id="test-ver" style="font-size: 0.5rem; font-family: var(--mono); color: var(--primary);">v1.2.2</div>
                         </div>
-                        <div class="outcome-pill fail" id="go-fail">
-                            <span style="font-size: 0.5rem; opacity: 0.6;">PROD OU</span>
-                            Keep Previous Pin
+                        <div class="ou-node" id="ou-prod">
+                            <i class="material-symbols-rounded" style="font-size: 24px; color: var(--text-dim);">verified</i>
+                            <span class="ou-label">Production OU</span>
+                            <div id="prod-ver" style="font-size: 0.5rem; font-family: var(--mono); color: var(--success);">v1.2.2</div>
                         </div>
                     </div>
-                </div>
-
-                <div class="log-compact" id="g-logs">
-                    <div class="log-entry"><span>[GAC]</span> Awaiting update trigger...</div>
-                </div>
-
-                <div class="controls" id="g-ctrl">
-                    <button class="btn-sm primary" onclick="gNext()" id="g-next">Start Rollout</button>
-                    <div id="g-choice" style="display: none; gap: 8px; width: 100%;">
-                        <button class="btn-sm primary" onclick="gFinal('ok')">Validate OK</button>
-                        <button class="btn-sm danger" onclick="gFinal('fail')">Issue Found</button>
+                    <!-- Backend Mini Map -->
+                    <div style="position: absolute; bottom: 40px; right: 40px; display: flex; gap: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 16px; border: 1px solid var(--border);">
+                        <div class="server" id="srv-test" style="width: 50px; height: 60px; scale: 0.8; margin: 0;"><div class="server-lights"><div class="light"></div></div><span style="font-size: 0.4rem; font-family: var(--mono);">TEST_INST</span></div>
+                        <div class="server" id="srv-prod" style="width: 50px; height: 60px; scale: 0.8; margin: 0;"><div class="server-lights"><div class="light"></div></div><span style="font-size: 0.4rem; font-family: var(--mono);">PROD_HA</span></div>
                     </div>
                 </div>
+
+                <!-- Uninstall View -->
+                <div id="view-uninstall" class="stage-view">
+                    <div class="infra-grid">
+                        <div class="server" id="un-1"><div class="server-lights"><div class="light"></div><div class="light"></div></div><span class="ou-label" style="margin-top: 10px;">NODE_A</span></div>
+                        <div class="server" id="un-2"><div class="server-lights"><div class="light"></div><div class="light"></div></div><span class="ou-label" style="margin-top: 10px;">NODE_B</span></div>
+                        <div class="server" id="un-3"><div class="server-lights"><div class="light"></div><div class="light"></div></div><span class="ou-label" style="margin-top: 10px;">NODE_C</span></div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Backend Infrastructure -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title"><span class="material-symbols-rounded">dns</span> Backend Infrastructure</div>
-                    <button class="btn-sm" style="width: 32px; flex: none;" onclick="resetBe()"><span class="material-symbols-rounded">refresh</span></button>
-                </div>
-
-                <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-                    <button class="btn-sm" id="b-solo" onclick="setArch('solo')" style="font-size: 0.55rem;">Solo Server</button>
-                    <button class="btn-sm primary" id="b-ha" onclick="setArch('ha')" style="font-size: 0.55rem;">HA Cluster</button>
-                </div>
-
-                <div class="infra-mini">
-                    <div class="srv-tiny active" id="bn1"><div class="srv-box"></div><span class="srv-label">T01</span></div>
-                    <div class="srv-tiny active" id="bn2"><div class="srv-box"></div><span class="srv-label">T02</span></div>
-                    <div class="srv-tiny active" id="bn3"><div class="srv-box"></div><span class="srv-label">T03</span></div>
-                </div>
-
-                <div class="flow-container">
-                    <div class="node-pill active" id="bs1"><i class="material-symbols-rounded">terminal</i> Backend Update</div>
-                    <div class="connector-sm" id="bc1"></div>
-                    <div class="node-pill" id="bs2"><i class="material-symbols-rounded">dns</i> Deploy to Test</div>
-                    <div class="connector-sm" id="bc2"></div>
-                    <div class="node-pill" id="bs3"><i class="material-symbols-rounded">fact_check</i> Validate Update</div>
+            <!-- Command Center (Right) -->
+            <div class="command-center">
+                
+                <div id="ctrl-update" class="control-section">
+                    <span class="label-sm">Deployment Sequence</span>
                     
-                    <div class="decision-compact" id="b-dec" style="display: none;">
-                        <div class="outcome-pill ok" id="bo-ok">Apply to Prod</div>
-                        <div class="outcome-pill fail" id="bo-fail">Halt Update</div>
+                    <div class="action-card" id="ac-1" onclick="deployToTest()">
+                        <h4>1. Stage to Test OU</h4>
+                        <p>Inject VLauncher v1.2.4-GA into the Google Admin Console pilot group.</p>
+                    </div>
+
+                    <div class="action-card disabled" id="ac-2" onclick="validateUpdate()">
+                        <h4>2. Validate Behavior</h4>
+                        <p>Verify launch protocols, authentication persistence, and VDI handshake.</p>
+                    </div>
+
+                    <div class="action-card disabled" id="ac-3" onclick="promoteToProd()">
+                        <h4>3. Global Rollout</h4>
+                        <p>Unpin v1.2.2 and deploy v1.2.4-GA to all production endpoints.</p>
+                    </div>
+
+                    <span class="label-sm" style="margin-top: 10px;">Backend Strategy</span>
+                    <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                        <button class="btn btn-outline" id="arch-solo" onclick="setBackend('solo')">Solo</button>
+                        <button class="btn" id="arch-ha" onclick="setBackend('ha')">HA Cluster</button>
                     </div>
                 </div>
 
-                <div class="log-compact" id="b-logs">
-                    <div class="log-entry"><span>[SYS]</span> Ready for backend update.</div>
-                </div>
-
-                <div class="controls" id="b-ctrl">
-                    <button class="btn-sm primary" onclick="bNext()" id="b-next">Deploy Update</button>
-                    <div id="b-choice" style="display: none; gap: 8px; width: 100%;">
-                        <button class="btn-sm primary" onclick="bFinal('ok')">Success</button>
-                        <button class="btn-sm danger" onclick="bFinal('fail')">Issue Found</button>
+                <div id="ctrl-uninstall" class="control-section" style="display: none;">
+                    <span class="label-sm">Governance Actions</span>
+                    <div class="action-card" onclick="runSingleUninstall()">
+                        <h4>Single Node Uninstallation</h4>
+                        <p>Decommission one node. Quorum (2/3) will be validated before removal.</p>
+                    </div>
+                    <div class="action-card" onclick="runClusterUninstall()" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <h4 style="color: var(--error);">Full Cluster Wipe</h4>
+                        <p>Coordinate global purge of binaries and AD configuration records.</p>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="note-p">
-            <strong>GA Policy:</strong> Rollback is disabled to prevent Extension/Backend protocol drift. Validation via Test OUs/Instances is the mandatory path.
-        </div>
-    </div>
-
-    <!-- Tab 2: Lifecycle Management -->
-    <div id="tab-lifecycle" class="tab-content">
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">Cluster Governance</div>
-                    <div id="q-pill" style="font-size: 0.5rem; color: var(--success); font-weight: 900; border: 1px solid var(--success); padding: 1px 6px; border-radius: 4px;">QUORUM: OK</div>
+                <span class="label-sm">Mission Logs</span>
+                <div class="log-panel" id="logs">
+                    <div class="log-row"><span>[SYS]</span> Console initialized. Standing by.</div>
                 </div>
 
-                <div class="cluster-compact">
-                    <div class="node-card" id="u1"><div class="status-led-sm"></div><span class="material-symbols-rounded" style="font-size: 24px;">dns</span><span style="font-size: 0.5rem; font-family: var(--mono);">SRV_A</span></div>
-                    <div class="node-card" id="u2"><div class="status-led-sm"></div><span class="material-symbols-rounded" style="font-size: 24px;">dns</span><span style="font-size: 0.5rem; font-family: var(--mono);">SRV_B</span></div>
-                    <div class="node-card" id="u3"><div class="status-led-sm"></div><span class="material-symbols-rounded" style="font-size: 24px;">dns</span><span style="font-size: 0.5rem; font-family: var(--mono);">SRV_C</span></div>
-                </div>
-
-                <div class="log-compact" id="u-logs">
-                    <div class="log-entry"><span>[HA]</span> Cluster active. Nodes synced.</div>
-                </div>
-
-                <div class="controls">
-                    <button class="btn-sm" onclick="doSingle()" id="u-btn-s">Single Node</button>
-                    <button class="btn-sm danger" onclick="doAll()" id="u-btn-a">Cluster-Wide</button>
-                    <button class="btn-sm" style="flex: 0; width: 40px;" onclick="resetLife()"><span class="material-symbols-rounded">refresh</span></button>
+                <div class="note-bubble">
+                    <span style="color: var(--primary); font-weight: 800;">i</span> Rollback is intentionally disabled in GA to prevent version mismatch between GAC Extension and Admin Studio Backend.
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-title" style="margin-bottom: 12px;">Uninstallation Standards</div>
-                <div style="font-size: 0.7rem; line-height: 1.6; color: var(--text-dim);">
-                    <p><strong>1. Single Node:</strong> Removes membership record and purges server binaries. Quorum must remain above 50%.</p>
-                    <p style="margin-top: 10px;"><strong>2. Cluster-Wide:</strong> Full decommissioning. Wipes global config store and clears AD object associations.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
-        function switchTab(tab, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('tab-' + tab).classList.add('active');
-        }
-
-        function addLog(id, msg) {
-            const el = document.getElementById(id);
+        const logs = document.getElementById('logs');
+        function addLog(msg) {
             const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
-            const line = document.createElement('div');
-            line.className = 'log-entry';
-            line.innerHTML = `<span>[${time}]</span> ${msg}`;
-            el.prepend(line);
+            const row = document.createElement('div');
+            row.className = 'log-row';
+            row.innerHTML = `<span>[${time}]</span> ${msg}`;
+            logs.prepend(row);
         }
 
-        /* --- GAC Logic --- */
-        let gStep = 1;
-        function gNext() {
-            if(gStep === 1) {
-                document.getElementById('gs1').classList.add('complete');
-                document.getElementById('gc1').classList.add('active');
-                document.getElementById('gs2').classList.add('active');
-                document.getElementById('g-next').innerText = "Simulate Validation";
-                addLog('g-logs', "Deployed to Google Admin Console Test OU.");
-            } else if(gStep === 2) {
-                document.getElementById('gs2').classList.add('complete');
-                document.getElementById('gc2').classList.add('active');
-                document.getElementById('gs3').classList.add('active');
-                document.getElementById('g-next').style.display = "none";
-                document.getElementById('g-choice').style.display = "flex";
-                addLog('g-logs', "Validation cycle started on test endpoints...");
-            }
-            gStep++;
-        }
-        function gFinal(type) {
-            document.getElementById('gs3').classList.add('complete');
-            document.getElementById('g-dec').style.display = "flex";
-            document.getElementById('g-choice').style.display = "none";
-            document.getElementById(type === 'ok' ? 'go-ok' : 'go-fail').classList.add('active');
-            addLog('g-logs', type === 'ok' ? "VALIDATION OK. Deploying to Prod OU." : "ISSUE FOUND. Rollout aborted for Prod.");
-        }
-        function resetGac() {
-            gStep = 1;
-            document.querySelectorAll('#tab-rollout .card:first-child .node-pill').forEach(s => s.classList.remove('active', 'complete', 'failed'));
-            document.querySelectorAll('#tab-rollout .card:first-child .connector-sm').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('#g-dec .outcome-pill').forEach(o => o.classList.remove('active'));
-            document.getElementById('gs1').classList.add('active');
-            document.getElementById('g-dec').style.display = "none";
-            document.getElementById('g-next').style.display = "flex";
-            document.getElementById('g-next').innerText = "Start Rollout";
-            document.getElementById('g-choice').style.display = "none";
-            document.getElementById('g-logs').innerHTML = '<div class="log-entry"><span>[GAC]</span> Awaiting update trigger...</div>';
+        function setTab(tab, btn) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.stage-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.control-section').forEach(s => s.style.display = 'none');
+            
+            btn.classList.add('active');
+            document.getElementById('view-' + tab).classList.add('active');
+            document.getElementById('ctrl-' + tab).style.display = 'block';
+            addLog(`Switched to ${tab.toUpperCase()} view.`);
         }
 
-        /* --- Backend Logic --- */
-        let bStep = 1; let bArch = 'ha';
-        function setArch(t) {
-            bArch = t;
-            document.getElementById('b-solo').classList.toggle('primary', t === 'solo');
-            document.getElementById('b-ha').classList.toggle('primary', t === 'ha');
-            document.querySelectorAll('#bn2, #bn3').forEach(n => n.classList.toggle('active', t === 'ha'));
-        }
-        function bNext() {
-            if(bStep === 1) {
-                document.getElementById('bs1').classList.add('complete');
-                document.getElementById('bc1').classList.add('active');
-                document.getElementById('bs2').classList.add('active');
-                document.querySelectorAll('.srv-tiny.active').forEach(n => n.classList.add('updating'));
-                document.getElementById('b-next').innerText = "Verify Update";
-                addLog('b-logs', `Updating Test Instance (${bArch.toUpperCase()})...`);
-            } else if(bStep === 2) {
-                document.getElementById('bs2').classList.add('complete');
-                document.getElementById('bc2').classList.add('active');
-                document.getElementById('bs3').classList.add('active');
-                document.querySelectorAll('.srv-tiny.active').forEach(n => {n.classList.remove('updating'); n.classList.add('ready');});
-                document.getElementById('b-next').style.display = "none";
-                document.getElementById('b-choice').style.display = "flex";
-                addLog('b-logs', "Running integrity validation...");
-            }
-            bStep++;
-        }
-        function bFinal(t) {
-            document.getElementById('bs3').classList.add('complete');
-            document.getElementById('b-dec').style.display = "flex";
-            document.getElementById('b-choice').style.display = "none";
-            document.getElementById(t === 'ok' ? 'bo-ok' : 'bo-fail').classList.add('active');
-            addLog('b-logs', t === 'ok' ? "VALIDATION SUCCESS. Ready for Production." : "ANOMALY DETECTED. Rollout halted.");
-        }
-        function resetBe() {
-            bStep = 1;
-            document.querySelectorAll('#bs1, #bs2, #bs3').forEach(s => s.classList.remove('active', 'complete', 'failed'));
-            document.querySelectorAll('#bc1, #bc2').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.srv-tiny').forEach(n => n.classList.remove('updating', 'ready'));
-            document.querySelectorAll('#b-dec .outcome-pill').forEach(o => o.classList.remove('active'));
-            document.getElementById('bs1').classList.add('active');
-            document.getElementById('b-dec').style.display = "none";
-            document.getElementById('b-next').style.display = "flex";
-            document.getElementById('b-next').innerText = "Deploy Update";
-            document.getElementById('b-choice').style.display = "none";
-            document.getElementById('b-logs').innerHTML = '<div class="log-entry"><span>[SYS]</span> Ready for backend update.</div>';
-        }
-
-        /* --- Lifecycle Logic --- */
-        function doSingle() {
-            document.getElementById('u2').classList.add('removed');
-            addLog('u-logs', "Single Node Uninstall (SRV_B) initiated...");
+        /* --- Update Sequence --- */
+        let sequence = 1;
+        function deployToTest() {
+            if(sequence !== 1) return;
+            const pkg = document.getElementById('pkg-node');
+            pkg.style.display = 'flex';
+            addLog("Initiating transfer: GAC -> Test OU...");
+            
             setTimeout(() => {
-                document.getElementById('q-pill').innerText = "QUORUM: RETAINED (2/3)";
-                addLog('u-logs', "Integrity Verified. Service Online.");
-            }, 800);
-        }
-        function doAll() {
-            document.querySelectorAll('.node-card').forEach(n => n.classList.add('removed'));
-            addLog('u-logs', "CRITICAL: Cluster-Wide Uninstall triggered.");
+                pkg.style.top = '250px';
+                pkg.style.left = 'calc(50% - 120px)';
+                document.getElementById('ou-test').classList.add('active');
+                document.getElementById('srv-test').classList.add('updating');
+                addLog("Package staged in Test OU. Updating Validation Instance...");
+            }, 500);
+
             setTimeout(() => {
-                document.getElementById('q-pill').innerText = "OFFLINE";
-                document.getElementById('q-pill').style.color = "var(--error)";
-                addLog('u-logs', "All node records purged. Env offline.");
+                document.getElementById('test-ver').innerText = 'v1.2.4-GA';
+                document.getElementById('srv-test').classList.remove('updating');
+                document.getElementById('srv-test').classList.add('ready');
+                document.getElementById('ac-1').classList.add('disabled');
+                document.getElementById('ac-2').classList.remove('disabled');
+                addLog("Validation Instance READY. Awaiting behavioral audit.");
+                sequence = 2;
+            }, 2500);
+        }
+
+        function validateUpdate() {
+            if(sequence !== 2) return;
+            addLog("Executing automated health probes...");
+            document.getElementById('global-status').innerText = 'VALIDATING...';
+            document.getElementById('global-status').style.color = 'var(--warning)';
+
+            setTimeout(() => {
+                document.getElementById('global-status').innerText = 'VALIDATION_PASSED';
+                document.getElementById('global-status').style.color = 'var(--success)';
+                document.getElementById('ac-2').classList.add('disabled');
+                document.getElementById('ac-3').classList.remove('disabled');
+                addLog("Protocols verified. Production rollout authorized.");
+                sequence = 3;
+            }, 1500);
+        }
+
+        function promoteToProd() {
+            if(sequence !== 3) return;
+            const pkg = document.getElementById('pkg-node');
+            addLog("Promoting to Production OU. Global unpinning active.");
+            
+            pkg.style.left = 'calc(50% + 80px)';
+            document.getElementById('srv-prod').classList.add('updating');
+
+            setTimeout(() => {
+                document.getElementById('ou-prod').classList.add('updated');
+                document.getElementById('prod-ver').innerText = 'v1.2.4-GA';
+                document.getElementById('srv-prod').classList.remove('updating');
+                document.getElementById('srv-prod').classList.add('ready');
+                document.getElementById('ac-3').classList.add('disabled');
+                addLog("ROLLOUT COMPLETE. All endpoints synchronized.");
+            }, 2000);
+        }
+
+        let currentArch = 'ha';
+        function setBackend(type) {
+            currentArch = type;
+            document.getElementById('arch-solo').classList.toggle('btn-outline', type !== 'solo');
+            document.getElementById('arch-ha').classList.toggle('btn-outline', type !== 'ha');
+            addLog(`Backend Strategy: ${type.toUpperCase()} validation instance.`);
+        }
+
+        /* --- Uninstall Sequence --- */
+        function runSingleUninstall() {
+            const node = document.getElementById('un-2');
+            addLog("Checking Quorum integrity... [n=3, req=2]");
+            
+            setTimeout(() => {
+                addLog("Quorum OK. Decommissioning NODE_B.");
+                node.classList.add('removed');
             }, 1000);
+            
+            setTimeout(() => {
+                addLog("Uninstallation successful. NODE_B records purged.");
+            }, 2000);
         }
-        function resetLife() {
-            document.querySelectorAll('.node-card').forEach(n => n.classList.remove('removed'));
-            document.getElementById('q-pill').innerText = "QUORUM: OK";
-            document.getElementById('q-pill').style.color = "var(--success)";
-            addLog('u-logs', "Cluster reset to baseline.");
+
+        function runClusterUninstall() {
+            addLog("INITIATING GLOBAL DECOMMISSIONING...");
+            document.getElementById('global-status').innerText = 'DECOMMISSIONING';
+            document.getElementById('global-status').style.color = 'var(--error)';
+            
+            setTimeout(() => {
+                document.querySelectorAll('#view-uninstall .server').forEach(s => s.classList.add('removed'));
+                addLog("AllParticipating Nodes wiped. Cleaning AD configuration...");
+            }, 500);
+
+            setTimeout(() => {
+                addLog("System Offline. Environment cleared.");
+            }, 2500);
+        }
+
+        function resetAll() {
+            location.reload();
         }
     </script>
 </body>
