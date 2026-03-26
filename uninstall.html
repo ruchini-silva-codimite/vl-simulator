@@ -34,7 +34,7 @@
         .logo { display: flex; align-items: center; gap: 15px; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
         .logo span { color: var(--error); text-shadow: 0 0 20px var(--error-glow); }
 
-        .main-container { flex: 1; display: grid; grid-template-columns: 1fr 320px; gap: 30px; padding: 40px 50px; overflow: hidden; }
+        .main-container { flex: 1; display: grid; grid-template-columns: 1fr 350px; gap: 30px; padding: 30px 50px; overflow: hidden; }
         
         /* Simulation Canvas */
         .simulation-area {
@@ -47,50 +47,49 @@
             padding: 30px 40px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: flex-start;
         }
-        .scenario-info h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
-        .scenario-info p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; max-width: 500px; }
+        .scenario-info h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
+        .scenario-info p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; max-width: 600px; }
 
-        .quorum-indicator {
-            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 10px 20px; border-radius: 16px; display: flex; align-items: center; gap: 15px;
-        }
-        .quorum-dots { display: flex; gap: 6px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success-glow); transition: 0.5s; }
-        .dot.dead { background: var(--border); box-shadow: none; opacity: 0.3; }
-
-        .viz-container { flex: 1; position: relative; display: flex; align-items: center; justify-content: space-between; padding: 0 100px; }
+        .viz-container { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 40px; }
 
         /* Infrastructure Components */
         .infra-group { display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 10; position: relative; }
         .laptop { 
-            width: 120px; height: 80px; background: #1e293b; border: 4px solid #334155; border-radius: 12px; position: relative;
+            width: 140px; height: 95px; background: #1e293b; border: 4px solid #334155; border-radius: 12px; position: relative;
             box-shadow: 0 0 30px rgba(0,0,0,0.4); transition: 0.5s;
         }
-        .laptop::after { content: ''; position: absolute; bottom: -10px; left: -12px; right: -12px; height: 6px; background: #334155; border-radius: 0 0 12px 12px; }
-        .screen { position: absolute; inset: 6px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
-        .v-logo { width: 35px; height: 35px; fill: var(--primary); filter: drop-shadow(0 0 10px var(--primary-glow)); transition: 0.8s; }
+        .laptop::after { content: ''; position: absolute; bottom: -12px; left: -14px; right: -14px; height: 8px; background: #334155; border-radius: 0 0 14px 14px; }
+        .screen { position: absolute; inset: 8px; background: #000; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+        .v-logo { width: 45px; height: 45px; fill: var(--primary); filter: drop-shadow(0 0 10px var(--primary-glow)); transition: 0.8s; }
         .laptop.disconnected .v-logo { fill: var(--text-dim); opacity: 0.1; filter: none; }
-        .laptop.disconnected { border-color: var(--border); opacity: 0.5; }
 
-        .cluster-rack { display: flex; gap: 20px; }
+        .lb-unit {
+            width: 100px; height: 45px; background: #334155; border: 2px solid #475569; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 8px; position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 10;
+        }
+        .lb-led { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success-glow); }
+        .lb-led.off { background: #1e293b; box-shadow: none; }
+
+        .cluster-rack { display: flex; gap: 25px; border: 1px dashed rgba(255,255,255,0.1); padding: 30px; border-radius: 24px; background: rgba(255,255,255,0.02); }
         .node {
-            width: 100px; height: 140px; background: #1e293b; border: 2px solid var(--success); border-radius: 16px;
-            display: flex; flex-direction: column; padding: 12px; gap: 10px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 110px; height: 150px; background: #1e293b; border: 2px solid var(--success); border-radius: 16px;
+            display: flex; flex-direction: column; padding: 14px; gap: 10px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative; box-shadow: 0 0 25px var(--success-glow);
         }
         .node.uninstalling { border-color: var(--error); box-shadow: 0 0 20px var(--error-glow); animation: node-pulse 1.5s infinite; }
         .node.removed { border-color: var(--border); opacity: 0.1; transform: scale(0.9) translateY(10px); filter: grayscale(1); box-shadow: none; }
         
-        .node-label { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); text-align: center; margin-bottom: 2px; }
-        .layer { flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px; font-size: 0.6rem; font-weight: 800; display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
-        .layer.app { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .node-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); text-align: center; }
+        .layer { flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; justify-content: center; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.05); }
+        .layer.app { background: rgba(59, 130, 246, 0.1); color: var(--primary); border-color: rgba(59, 130, 246, 0.2); }
 
-        /* Connection Lines */
+        /* Flow SVG */
         .flow-svg { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; z-index: 1; }
-        line { stroke: var(--success); stroke-width: 2.5; transition: 0.8s; stroke-dasharray: 0; }
-        line.dead { stroke: var(--border); stroke-dasharray: 6; opacity: 0.2; }
+        line { stroke: var(--success); stroke-width: 2.5; transition: 0.8s; stroke-dasharray: 0; opacity: 0.6; }
+        line.dead { stroke: var(--border); stroke-dasharray: 6; opacity: 0.1; }
 
-        /* Control Sidebar */
+        /* Sidebar & Controls */
         .sidebar { display: flex; flex-direction: column; gap: 25px; }
         .control-card {
             background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 25px;
@@ -98,19 +97,15 @@
         }
         .card-title { font-size: 0.75rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; }
         
-        .action-group { display: flex; flex-direction: column; gap: 12px; }
         .btn-action {
             width: 100%; padding: 16px; border-radius: 14px; border: 1px solid var(--border);
             background: var(--surface-light); color: var(--text); font-size: 0.8rem; font-weight: 700;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px;
-            text-align: left;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
         }
         .btn-action:hover:not(:disabled) { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
-        .btn-action.danger:hover:not(:disabled) { border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
-        .btn-action .icon { width: 32px; height: 32px; border-radius: 10px; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--text-dim); transition: 0.3s; }
-        .btn-action:hover .icon { color: var(--text); }
         .btn-action.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
-        .btn-action.active .icon { color: var(--primary); background: var(--surface); }
+        .btn-action.danger:hover:not(:disabled) { border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
+        .btn-action .icon { width: 32px; height: 32px; border-radius: 10px; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--text-dim); }
 
         .btn-execute {
             width: 100%; padding: 18px; border-radius: 16px; border: none;
@@ -121,28 +116,32 @@
         .btn-execute:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 15px 40px var(--error-glow); }
         .btn-execute:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* Audit Logs */
-        .logs-card { flex: 1; background: #000; border: 1px solid var(--border); border-radius: 24px; padding: 25px; display: flex; flex-direction: column; gap: 15px; }
-        .log-list { flex: 1; font-family: var(--mono); font-size: 0.75rem; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .log-item { color: var(--text-dim); line-height: 1.5; }
+        /* Audit Logs with FIXED height and scroller */
+        .logs-card { height: 260px; background: #000; border: 1px solid var(--border); border-radius: 24px; padding: 20px 25px; display: flex; flex-direction: column; gap: 15px; }
+        .log-container { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+        .log-container::-webkit-scrollbar { width: 6px; }
+        .log-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        .log-list { display: flex; flex-direction: column; gap: 10px; }
+        .log-item { color: var(--text-dim); line-height: 1.5; font-family: var(--mono); font-size: 0.75rem; border-left: 2px solid var(--border); padding-left: 15px; }
         .log-item b { color: var(--error); }
         .log-item.sys b { color: var(--primary); }
-        .log-item span { opacity: 0.4; margin-right: 12px; }
+        .log-item span { opacity: 0.4; font-size: 0.65rem; display: block; margin-bottom: 2px; }
 
         @keyframes node-pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 20px; }
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo">VLAUNCHER <span>UNINSTALLATION_ENGINE</span></div>
-        <div style="display: flex; gap: 25px; align-items: center;">
-            <div id="global-status" style="font-family: var(--mono); font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px 20px; border-radius: 100px; letter-spacing: 1px; font-weight: 700;">
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div id="global-status" style="font-family: var(--mono); font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 8px 20px; border-radius: 100px; font-weight: 700;">
                 INFRASTRUCTURE: HEALTHY
             </div>
-            <button class="btn-reset" style="background: var(--surface-light); border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px; color: var(--text); cursor: pointer; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;" onclick="location.reload()">
-                Reset Simulator
+            <button style="background: var(--surface-light); border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px; color: var(--text); cursor: pointer; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;" onclick="location.reload()">
+                Reset
             </button>
         </div>
     </header>
@@ -155,18 +154,11 @@
                     <h2 id="scenario-title">Single Node Uninstallation</h2>
                     <p id="scenario-desc">Removing a single node from the cluster. Quorum remains intact (2/3 nodes), ensuring the VLauncher system stays fully operational during the maintenance.</p>
                 </div>
-                <div class="quorum-indicator">
-                    <div style="font-size: 0.6rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;">Quorum Status</div>
-                    <div class="quorum-dots" id="quorum-dots">
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                    </div>
-                </div>
             </div>
 
             <div class="viz-container">
-                <div class="infra-group">
+                <!-- VLauncher Extension -->
+                <div class="infra-group" style="margin-right: 50px;">
                     <div class="laptop" id="lap">
                         <div class="screen">
                             <svg class="v-logo" viewBox="0 0 100 100">
@@ -179,33 +171,47 @@
                     <span style="font-size: 0.6rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase;">Extension Interface</span>
                 </div>
 
-                <svg class="flow-svg">
-                    <!-- Paths to Backend Nodes -->
-                    <line id="l1" x1="160" y1="50%" x2="calc(100% - 340px)" y2="50%" />
-                    <line id="l2" x1="160" y1="50%" x2="calc(100% - 220px)" y2="50%" />
-                    <line id="l3" x1="160" y1="50%" x2="calc(100% - 100px)" y2="50%" />
-                </svg>
+                <!-- Load Balancer -->
+                <div class="infra-group" style="margin-right: 50px;">
+                    <div class="lb-unit" id="lb">
+                        <div class="lb-led" id="led1"></div>
+                        <div class="lb-led" id="led2"></div>
+                        <div class="lb-led" id="led3"></div>
+                    </div>
+                    <span style="font-size: 0.6rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase;">Load Balancer</span>
+                </div>
 
+                <!-- Backend Cluster -->
                 <div class="cluster-rack">
                     <div class="node" id="n1">
-                        <div class="node-label">Node 1</div>
-                        <div class="layer app">Backend</div>
-                        <div class="layer">Storage</div>
-                        <div class="layer">Member</div>
+                        <div class="node-label">Server 01</div>
+                        <div class="layer app">Application</div>
+                        <div class="layer">Database</div>
+                        <div class="layer">Active</div>
                     </div>
                     <div class="node" id="n2">
-                        <div class="node-label">Node 2</div>
-                        <div class="layer app">Backend</div>
-                        <div class="layer">Storage</div>
-                        <div class="layer">Member</div>
+                        <div class="node-label">Server 02</div>
+                        <div class="layer app">Application</div>
+                        <div class="layer">Database</div>
+                        <div class="layer">Active</div>
                     </div>
                     <div class="node" id="n3">
-                        <div class="node-label">Node 3</div>
-                        <div class="layer app">Backend</div>
-                        <div class="layer">Storage</div>
-                        <div class="layer">Member</div>
+                        <div class="node-label">Server 03</div>
+                        <div class="layer app">Application</div>
+                        <div class="layer">Database</div>
+                        <div class="layer">Active</div>
                     </div>
                 </div>
+
+                <svg class="flow-svg" id="svg-root">
+                    <!-- Lines from Extension to LB -->
+                    <line id="l-ext" x1="190" y1="50%" x2="calc(50% - 130px)" y2="50%" />
+                    
+                    <!-- Lines from LB to Nodes -->
+                    <line id="l1" x1="calc(50% - 30px)" y1="50%" x2="calc(100% - 410px)" y2="50%" />
+                    <line id="l2" x1="calc(50% - 30px)" y1="50%" x2="calc(100% - 275px)" y2="50%" />
+                    <line id="l3" x1="calc(50% - 30px)" y1="50%" x2="calc(100% - 140px)" y2="50%" />
+                </svg>
             </div>
         </div>
 
@@ -214,17 +220,17 @@
                 <div class="card-title">Select Scenario</div>
                 <div class="action-group">
                     <button class="btn-action active" id="opt-single" onclick="selectScenario('single')">
-                        <div class="icon"><span class="material-symbols-rounded">person_remove</span></div>
+                        <div class="icon"><span class="material-symbols-rounded">dns</span></div>
                         <div>
-                            <div style="font-size: 0.75rem; font-weight: 800;">Single Node</div>
-                            <div style="font-size: 0.6rem; color: var(--text-dim); margin-top: 2px;">Preserve system quorum</div>
+                            <div style="font-size: 0.75rem; font-weight: 800;">Single Node Removal</div>
+                            <div style="font-size: 0.6rem; color: var(--text-dim); margin-top: 2px;">Keep cluster running</div>
                         </div>
                     </button>
                     <button class="btn-action danger" id="opt-cluster" onclick="selectScenario('cluster')">
-                        <div class="icon"><span class="material-symbols-rounded">group_remove</span></div>
+                        <div class="icon"><span class="material-symbols-rounded">Dvr</span></div>
                         <div>
-                            <div style="font-size: 0.75rem; font-weight: 800;">Full Cluster</div>
-                            <div style="font-size: 0.6rem; color: var(--text-dim); margin-top: 2px;">Total decommissioning</div>
+                            <div style="font-size: 0.75rem; font-weight: 800;">Cluster Teardown</div>
+                            <div style="font-size: 0.6rem; color: var(--text-dim); margin-top: 2px;">Full decommissioning</div>
                         </div>
                     </button>
                 </div>
@@ -235,8 +241,10 @@
 
             <div class="logs-card">
                 <div class="card-title">Live Audit Trail</div>
-                <div class="log-list" id="log-list">
-                    <div class="log-item sys"><span>[INIT]</span> <b>Quorum established.</b> Nodes 1, 2, and 3 are in synchronized state.</div>
+                <div class="log-container" id="log-container">
+                    <div class="log-list" id="log-list">
+                        <div class="log-item sys"><span>[SYSTEM]</span> <b>Environment Initialized.</b> Backend cluster is healthy and synchronized.</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -252,7 +260,11 @@
             const item = document.createElement('div');
             item.className = 'log-item' + (type === 'sys' ? ' sys' : '');
             item.innerHTML = `<span>${new Date().toLocaleTimeString([], {hour12: false})}</span> ${msg}`;
-            list.prepend(item);
+            list.appendChild(item);
+            
+            // Auto-scroll to bottom
+            const container = document.getElementById('log-container');
+            container.scrollTop = container.scrollHeight;
         }
 
         function selectScenario(s) {
@@ -266,12 +278,12 @@
             
             if(s === 'cluster') {
                 title.innerText = "Cluster-Wide Uninstallation";
-                desc.innerText = "Simulating the total decommissioning of the backend. All cluster members will be removed, services dismantled, and data purged. The system will go offline.";
-                addLog("<b>Switched:</b> Ready for cluster-wide decommissioning.", 'sys');
+                desc.innerText = "Full cluster teardown. All nodes will be decommissioned simultaneously, purging the shared database and dismantling the Windows Server infrastructure.";
+                addLog("<b>Scenario:</b> Switched to Cluster Teardown mode.", 'sys');
             } else {
                 title.innerText = "Single Node Uninstallation";
                 desc.innerText = "Removing a single node from the cluster. Quorum remains intact (2/3 nodes), ensuring the VLauncher system stays fully operational during the maintenance.";
-                addLog("<b>Switched:</b> Ready for single node removal sequence.", 'sys');
+                addLog("<b>Scenario:</b> Switched to Single Node Removal mode.", 'sys');
             }
         }
 
@@ -288,40 +300,41 @@
         }
 
         async function runSingle() {
-            addLog("<b>Initiating:</b> Requesting Node 1 removal from cluster membership...");
+            addLog("<b>Initiating:</b> Uninstalling VLauncher from Server 01...");
             document.getElementById('n1').classList.add('uninstalling');
             
             await wait(1500);
-            addLog("<b>Processing:</b> Draining traffic and flushing local storage buffers...");
+            addLog("<b>LB:</b> Draining traffic from Server 01. Redirecting to 02 and 03...");
+            document.getElementById('l1').classList.add('dead');
+            document.getElementById('led1').classList.add('off');
             
             await wait(1200);
-            document.getElementById('l1').classList.add('dead');
-            document.getElementById('quorum-dots').children[0].classList.add('dead');
-            addLog("<b>Removed:</b> Node 1 decoupled. Database membership purged.");
+            addLog("<b>Cluster:</b> Notifying quorum members of intent to leave...");
             
             await wait(1000);
+            addLog("<b>Database:</b> Node 01 membership purged successfully.", 'sys');
             document.getElementById('n1').classList.remove('uninstalling');
             document.getElementById('n1').classList.add('removed');
             
-            document.getElementById('global-status').innerText = "STATUS: DEGRADED (2/3 NODES)";
+            document.getElementById('global-status').innerText = "STATUS: DEGRADED (2/3)";
             document.getElementById('global-status').style.color = "var(--warning)";
             document.getElementById('global-status').style.background = "rgba(245, 158, 11, 0.1)";
             
-            addLog("<b>Verified:</b> Quorum maintained. Nodes 2 & 3 responding.", 'sys');
-            addLog("<b>Final:</b> Single node removal finalized. System remains UP.", 'sys');
+            addLog("<b>Result:</b> Server 01 removed. System remains ONLINE via Server 02/03.", 'sys');
         }
 
         async function runCluster() {
-            addLog("<b>CRITICAL:</b> Starting full decommissioning sequence...");
+            addLog("<b>CRITICAL:</b> Starting full cluster decommissioning sequence...");
             document.querySelectorAll('.node').forEach(n => n.classList.add('uninstalling'));
             
             await wait(1800);
-            addLog("<b>Processing:</b> Shutting down cluster coordination services...");
+            addLog("<b>LB:</b> Cutting all incoming extension traffic...");
+            document.getElementById('l-ext').classList.add('dead');
+            document.querySelectorAll('.lb-led').forEach(l => l.classList.add('off'));
             
             await wait(1200);
             document.querySelectorAll('line').forEach(l => l.classList.add('dead'));
-            document.querySelectorAll('.dot').forEach(d => d.classList.add('dead'));
-            addLog("<b>Wiping:</b> Purging membership database and identity stores...");
+            addLog("<b>Windows Server:</b> Dismantling backend services on all nodes...");
             
             await wait(1500);
             document.querySelectorAll('.node').forEach(n => {
@@ -334,8 +347,8 @@
             document.getElementById('global-status').style.color = "var(--text-dim)";
             document.getElementById('global-status').style.background = "rgba(148, 163, 184, 0.1)";
             
-            addLog("<b>Shutdown:</b> Extension disconnected. No active cluster nodes found.");
-            addLog("<b>Final:</b> Infrastructure dismantled. System is now OFFLINE.", 'sys');
+            addLog("<b>Purge:</b> Shared cluster database and logs wiped.");
+            addLog("<b>Success:</b> Backend infrastructure dismantled. System is OFFLINE.", 'sys');
         }
 
         function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
