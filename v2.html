@@ -67,24 +67,39 @@
         .track-title { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px; }
         .track-title b { color: var(--text); }
 
-        .track-visual { height: 100px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .track-visual { height: 120px; display: flex; align-items: center; justify-content: center; position: relative; }
 
+        /* Source Points */
+        .source-group {
+            position: absolute; left: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
         .source-node {
-            position: absolute; left: 10px; width: 14px; height: 14px;
+            width: 14px; height: 14px;
             background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb);
             border-radius: 50%; box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
             z-index: 10;
         }
         .source-node.be { background: radial-gradient(circle at 30% 30%, #a78bfa, #7c3aed); box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); }
 
-        /* Traveling Package */
+        /* Small Deploy Buttons */
+        .btn-small {
+            padding: 4px 8px; font-size: 0.55rem; font-weight: 800; border-radius: 6px;
+            background: var(--primary); color: #fff; border: none; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        .btn-small.be { background: #8b5cf6; box-shadow: 0 0 10px rgba(139, 92, 246, 0.3); }
+        .btn-small:hover:not(:disabled) { filter: brightness(1.2); transform: scale(1.05); }
+        .btn-small:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Package Animation */
         .package {
             position: absolute; width: 10px; height: 10px; border-radius: 50%;
-            background: #fff; box-shadow: 0 0 10px #fff;
-            z-index: 20; display: none;
+            background: #fff; box-shadow: 0 0 12px #fff;
+            z-index: 20; display: none; left: 12px; top: 50%; margin-top: -15px;
         }
 
-        .device { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 5; }
+        .device { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 5; margin-left: auto; margin-right: 40px; }
         .laptop { 
             width: 100px; height: 65px; background: #1e293b; border: 3px solid #334155; border-radius: 8px; position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.3); transition: 0.3s;
@@ -92,16 +107,14 @@
         .laptop::after { content: ''; position: absolute; bottom: -8px; left: -10px; right: -10px; height: 5px; background: #334155; border-radius: 0 0 10px 10px; }
         .screen { position: absolute; inset: 4px; background: #000; border-radius: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
-        /* SVG Logo Replacement */
         .v-logo { width: 30px; height: 30px; fill: var(--primary); opacity: 0.1; transition: 0.5s; }
         .laptop.ready .v-logo { opacity: 1; filter: drop-shadow(0 0 8px var(--primary-glow)); }
 
-        .server-rack { display: flex; gap: 12px; z-index: 5; }
+        .server-rack { display: flex; gap: 12px; z-index: 5; margin-left: auto; margin-right: 20px; }
         .node {
             width: 85px; height: 110px; background: #1e293b; border: 2px solid var(--border); border-radius: 12px;
             display: flex; flex-direction: column; padding: 8px; gap: 6px; transition: 0.5s; position: relative;
         }
-        .node::before { content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 25px; height: 3px; background: var(--border); border-radius: 2px; }
         .node.updating { border-color: var(--warning); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); animation: node-pulse 1.5s infinite; }
         .node.ready { border-color: var(--success); box-shadow: 0 0 20px var(--success-glow); }
         
@@ -111,6 +124,8 @@
         .ver { font-family: var(--mono); font-size: 0.55rem; font-weight: 700; color: var(--text-dim); }
         .ver.new { color: var(--success); }
 
+        /* Gate and Validation placement */
+        .val-anchor { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); z-index: 100; display: none; }
         .gate-center { width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding-top: 60px; }
         .gate-btn {
             width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface);
@@ -122,31 +137,27 @@
         .gate-btn.selected.fail { background: var(--error); border-color: var(--error); color: #fff; box-shadow: 0 0 30px rgba(239, 68, 68, 0.3); }
 
         .footer-workflow {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 25px 35px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px 35px;
             display: flex; align-items: center; gap: 30px; box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
         }
-        .log-display { flex: 1; height: 60px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px 20px; font-family: var(--mono); font-size: 0.75rem; overflow: hidden; display: flex; flex-direction: column; gap: 4px; }
+        .log-display { flex: 1; height: 50px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px 20px; font-family: var(--mono); font-size: 0.75rem; overflow: hidden; display: flex; flex-direction: column; gap: 2px; }
         .log-entry { color: var(--success); opacity: 0.9; }
         .log-entry span { color: var(--text-dim); margin-right: 10px; }
 
-        .btn-group { display: flex; gap: 15px; }
-        .btn {
-            padding: 16px 24px; background: var(--primary); color: #fff; border: none; border-radius: 14px;
-            font-size: 0.75rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px;
-            transition: 0.3s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px var(--primary-glow);
+        .btn-val {
+            padding: 12px 20px; background: var(--success); color: #fff; border: none; border-radius: 10px;
+            font-size: 0.7rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 0 20px var(--success-glow);
         }
-        .btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.1); }
-        .btn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; transform: none; }
-        .btn.secondary { background: #8b5cf6; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
 
-        .path-svg { position: absolute; inset: 0; pointer-events: none; }
-        line { stroke: var(--border); stroke-width: 2; stroke-dasharray: 6; }
-        line.active { stroke: var(--primary); stroke-dasharray: 0; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        line.active-be { stroke: #8b5cf6; stroke-dasharray: 0; transition: 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* SVG Paths fully connected */
+        .path-svg { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; }
+        line { stroke: var(--border); stroke-width: 2; stroke-dasharray: 4; }
+        line.active { stroke: var(--primary); stroke-dasharray: 0; transition: 0.8s; }
+        line.active-be { stroke: #8b5cf6; stroke-dasharray: 0; transition: 0.8s; }
 
         @keyframes node-pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 28px; }
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 24px; }
     </style>
 </head>
 <body>
@@ -157,7 +168,7 @@
             <div id="sys-stat" style="font-family: var(--mono); font-size: 0.65rem; color: var(--success); background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px 15px; border-radius: 100px;">
                 SYSTEM_READY // v1.2.2_STABLE
             </div>
-            <button class="btn" style="padding: 10px; background: var(--surface-light); box-shadow: none;" onclick="location.reload()">
+            <button style="padding: 10px; background: var(--surface-light); border: none; border-radius: 10px; color: #fff; cursor: pointer;" onclick="location.reload()">
                 <span class="material-symbols-rounded" style="font-size: 20px;">refresh</span>
             </button>
         </div>
@@ -173,17 +184,30 @@
         <div class="simulation-grid">
             
             <div class="instance-card test">
-                <div class="card-tag">Staging / Test</div>
+                <div class="card-tag">Test Instance</div>
                 
+                <!-- VAL BUTTON ANCHOR -->
+                <div class="val-anchor" id="val-anchor">
+                    <button class="btn-val" onclick="completeValidation()">
+                        Complete Validation <span class="material-symbols-rounded">fact_check</span>
+                    </button>
+                </div>
+
                 <div class="track">
                     <div class="track-header">
                         <div class="track-title">Google Admin Console — <b>Extension</b></div>
                         <div class="ver" id="v-test-ext">v1.2.2</div>
                     </div>
-                    <div class="track-visual" id="v-test-ext-visual">
-                        <div class="source-node" id="src-test-ext"></div>
+                    <div class="track-visual">
+                        <div class="source-group" style="top: 50%; margin-top: -25px;">
+                            <div class="source-node"></div>
+                            <button class="btn-small" id="btn-ext" onclick="deployExt()">Deploy Extension</button>
+                        </div>
                         <div class="package" id="pkg-test-ext"></div>
-                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-test-ext" /></svg>
+                        <svg class="path-svg">
+                            <!-- Adjusted x2 to end inside the laptop -->
+                            <line x1="18" y1="50%" x2="calc(100% - 90px)" y2="50%" id="l-test-ext" />
+                        </svg>
                         <div class="device">
                             <div class="laptop" id="lap-test">
                                 <div class="screen">
@@ -204,10 +228,16 @@
                         <div class="track-title">AD & Windows — <b>Backend</b></div>
                         <div class="ver" id="v-test-be">v1.2.2</div>
                     </div>
-                    <div class="track-visual" id="v-test-be-visual">
-                        <div class="source-node be" id="src-test-be"></div>
+                    <div class="track-visual">
+                        <div class="source-group" style="top: 50%; margin-top: -25px;">
+                            <div class="source-node be"></div>
+                            <button class="btn-small be" id="btn-be" onclick="deployBE()">Deploy Backend</button>
+                        </div>
                         <div class="package" id="pkg-test-be"></div>
-                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-test-be" /></svg>
+                        <svg class="path-svg">
+                            <!-- Adjusted x2 to end inside the server rack -->
+                            <line x1="18" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-test-be" />
+                        </svg>
                         <div class="server-rack" id="rack-test">
                             <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
                         </div>
@@ -216,10 +246,10 @@
             </div>
 
             <div class="gate-center" id="gate" style="opacity: 0.1; pointer-events: none;">
-                <div class="gate-btn ok" onclick="decide('ok')" title="Approve Rollout">
+                <div class="gate-btn ok" onclick="decide('ok')">
                     <span class="material-symbols-rounded">verified</span>
                 </div>
-                <div class="gate-btn fail" onclick="decide('fail')" title="Halt & Reject">
+                <div class="gate-btn fail" onclick="decide('fail')">
                     <span class="material-symbols-rounded">block</span>
                 </div>
             </div>
@@ -233,9 +263,9 @@
                         <div class="ver" id="v-prod-ext">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <div class="source-node" style="opacity: 0.3;"></div>
+                        <div class="source-node" style="left: 10px; opacity: 0.3;"></div>
                         <div class="package" id="pkg-prod-ext"></div>
-                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 100px)" y2="50%" id="l-prod-ext" /></svg>
+                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 90px)" y2="50%" id="l-prod-ext" /></svg>
                         <div class="device">
                             <div class="laptop" id="lap-prod">
                                 <div class="screen">
@@ -256,9 +286,9 @@
                         <div class="ver" id="v-prod-be">v1.2.2</div>
                     </div>
                     <div class="track-visual">
-                        <div class="source-node be" style="opacity: 0.3;"></div>
+                        <div class="source-node be" style="left: 10px; opacity: 0.3;"></div>
                         <div class="package" id="pkg-prod-be"></div>
-                        <svg class="path-svg"><line x1="24" y1="50%" x2="calc(100% - 150px)" y2="50%" id="l-prod-be" /></svg>
+                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-prod-be" /></svg>
                         <div class="server-rack" id="rack-prod">
                             <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
                         </div>
@@ -275,17 +305,6 @@
                     <div class="log-entry"><span>[SYS]</span> Console initialized. Architecture: Single Server.</div>
                 </div>
             </div>
-            <div class="btn-group" id="main-btns">
-                <button class="btn" id="btn-ext" onclick="deployExt()">
-                    Deploy Extension <span class="material-symbols-rounded">chrome_reader_mode</span>
-                </button>
-                <button class="btn secondary" id="btn-be" onclick="deployBE()">
-                    Deploy Backend <span class="material-symbols-rounded">terminal</span>
-                </button>
-            </div>
-            <button class="btn" id="btn-val" style="display: none; background: var(--success); box-shadow: 0 4px 15px var(--success-glow);" onclick="completeValidation()">
-                Complete Validation <span class="material-symbols-rounded">fact_check</span>
-            </button>
         </div>
 
     </div>
@@ -316,45 +335,44 @@
             if(type === 'ha') {
                 rTest.innerHTML = nodeHTML.repeat(3);
                 rProd.innerHTML = nodeHTML.repeat(3);
-                addLog("Switched to High Availability profile.");
+                addLog("Switched to HA Cluster configuration.");
             } else {
                 rTest.innerHTML = nodeHTML;
                 rProd.innerHTML = nodeHTML;
-                addLog("Switched to Single Server profile.");
+                addLog("Switched to Single Server baseline.");
             }
         }
 
-        function animatePackage(pkgId, lineId, onComplete) {
+        function animatePackage(pkgId, lineId, offset, onComplete) {
             const pkg = document.getElementById(pkgId);
             const line = document.getElementById(lineId);
-            const x1 = 24;
-            const x2 = line.x2.baseVal.value;
             
             pkg.style.display = 'block';
-            pkg.style.left = x1 + 'px';
+            pkg.style.left = '12px';
             pkg.style.top = 'calc(50% - 5px)';
             
             setTimeout(() => {
-                pkg.style.transition = 'left 1s cubic-bezier(0.4, 0, 0.2, 1)';
-                pkg.style.left = 'calc(100% - ' + (pkgId.includes('ext') ? '100px' : '150px') + ')';
+                pkg.style.transition = 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                // Stop inside the laptop or server rack
+                pkg.style.left = 'calc(100% - ' + offset + 'px)';
                 line.classList.add(pkgId.includes('be') ? 'active-be' : 'active');
             }, 50);
 
             setTimeout(() => {
                 pkg.style.display = 'none';
                 if(onComplete) onComplete();
-            }, 1050);
+            }, 850);
         }
 
         function deployExt() {
             document.getElementById('btn-ext').disabled = true;
-            addLog("Pushing Extension v1.2.4-GA to Google Admin Console...");
+            addLog("Pushing Extension v1.2.4 to Test OU...");
 
-            animatePackage('pkg-test-ext', 'l-test-ext', () => {
+            animatePackage('pkg-test-ext', 'l-test-ext', 70, () => {
                 document.getElementById('lap-test').classList.add('ready');
                 document.getElementById('v-test-ext').innerText = 'v1.2.4-GA';
                 document.getElementById('v-test-ext').classList.add('new');
-                addLog("Extension update delivered to Staging OU.");
+                addLog("Extension update internalized by Managed Device.");
                 extDeployed = true;
                 checkReadyForVal();
             });
@@ -362,35 +380,33 @@
 
         function deployBE() {
             document.getElementById('btn-be').disabled = true;
-            addLog("Executing Backend binary rollout via AD/GPO...");
+            addLog("Executing Backend rollout via AD...");
 
-            animatePackage('pkg-test-be', 'l-test-be', () => {
+            animatePackage('pkg-test-be', 'l-test-be', 50, () => {
                 const testNodes = document.querySelectorAll('#rack-test .node');
-                testNodes.forEach(n => { n.classList.add('ready'); });
+                testNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                 document.getElementById('v-test-be').innerText = 'v1.2.4-GA';
                 document.getElementById('v-test-be').classList.add('new');
-                addLog("Backend infrastructure updated in Staging.");
+                addLog("Backend infrastructure synchronized in Test.");
                 beDeployed = true;
                 checkReadyForVal();
             });
             
-            const testNodes = document.querySelectorAll('#rack-test .node');
-            testNodes.forEach(n => n.classList.add('updating'));
+            document.querySelectorAll('#rack-test .node').forEach(n => n.classList.add('updating'));
         }
 
         function checkReadyForVal() {
             if(extDeployed && beDeployed) {
-                document.getElementById('main-btns').style.display = 'none';
-                document.getElementById('btn-val').style.display = 'flex';
-                addLog("Update staged. Proceed to behavioral validation.");
+                document.getElementById('val-anchor').style.display = 'block';
+                addLog("Infrastructure staged. User validation required.");
             }
         }
 
         function completeValidation() {
-            document.getElementById('btn-val').style.display = 'none';
+            document.getElementById('val-anchor').style.display = 'none';
             document.getElementById('gate').style.opacity = '1';
             document.getElementById('gate').style.pointerEvents = 'auto';
-            addLog("Validation audit finished. Decision required.");
+            addLog("Validation audit passed. Ready for Production promotion.");
         }
 
         function decide(res) {
@@ -399,29 +415,29 @@
             document.getElementById('gate').style.pointerEvents = 'none';
 
             if(res === 'ok') {
-                addLog("Promotion Approved. Syncing Production fleet...");
+                addLog("Promotion Approved. Rolling out to Production Environment...");
                 document.getElementById('card-prod').style.opacity = '1';
                 
                 setTimeout(() => {
-                    animatePackage('pkg-prod-ext', 'l-prod-ext', () => {
+                    animatePackage('pkg-prod-ext', 'l-prod-ext', 70, () => {
                         document.getElementById('lap-prod').classList.add('ready');
                         document.getElementById('v-prod-ext').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-ext').classList.add('new');
                     });
 
-                    animatePackage('pkg-prod-be', 'l-prod-be', () => {
+                    animatePackage('pkg-prod-be', 'l-prod-be', 50, () => {
                         const prodNodes = document.querySelectorAll('#rack-prod .node');
                         prodNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                         document.getElementById('v-prod-be').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-be').classList.add('new');
-                        addLog("Global rollout finalized. All nodes synchronized.");
+                        addLog("Global rollout finalized. Fleet aligned on v1.2.4.");
                         document.getElementById('sys-stat').innerText = "SYSTEM_ALIGNED // v1.2.4_GA";
                     });
                     
                     document.querySelectorAll('#rack-prod .node').forEach(n => n.classList.add('updating'));
                 }, 500);
             } else {
-                addLog("Rollout Rejected. Production Instance stays on v1.2.2.");
+                addLog("Rollout Rejected. Production Environment remains stable.");
             }
         }
     </script>
