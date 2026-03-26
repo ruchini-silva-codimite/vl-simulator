@@ -3,339 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VLauncher Architecture Studio v2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>VLauncher Deployment Simulator v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <style>
         :root {
-            --bg: #f8fafc;
-            --surface: #ffffff;
+            --bg: #fdfdfe;
+            --test-bg: #f1f5f9;
+            --prod-bg: #f0f9ff;
             --border: #e2e8f0;
             --primary: #3b82f6;
-            --primary-soft: #eff6ff;
             --success: #10b981;
-            --warning: #f59e0b;
             --error: #ef4444;
             --text: #1e293b;
             --text-dim: #64748b;
+            --gac-color: #fee2e2;
+            --be-color: #f1f0ff;
             --mono: 'JetBrains Mono', monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* --- Header --- */
         header { 
-            height: 70px; background: #fff; border-bottom: 1px solid var(--border); 
-            display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02); z-index: 100;
+            height: 60px; padding: 0 40px; border-bottom: 1px solid var(--border); background: #fff;
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; }
-        .logo span { color: var(--primary); }
+        .header-title { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary); }
 
-        /* --- Navigation --- */
-        .nav-tabs { display: flex; background: #fff; border-bottom: 1px solid var(--border); padding: 0 40px; gap: 40px; }
-        .nav-btn {
-            padding: 20px 0; background: none; border: none; border-bottom: 3px solid transparent;
-            font-size: 0.85rem; font-weight: 800; color: var(--text-dim); cursor: pointer; transition: 0.2s;
+        .nav-bar { 
+            height: 50px; background: #fff; border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 40px; gap: 40px;
+        }
+        .nav-item { 
+            font-size: 0.8rem; font-weight: 700; color: var(--text-dim); cursor: pointer; 
+            padding: 15px 0; border-bottom: 3px solid transparent; transition: 0.2s;
             text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .nav-item.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* --- Main Content --- */
-        .main-container { flex: 1; display: flex; overflow: hidden; }
-        
-        /* Architecture Stage */
-        .arch-stage { flex: 1; background: #fff; position: relative; display: flex; flex-direction: column; padding: 40px; overflow-y: auto; align-items: center; }
-        
-        /* Control Panel */
-        .control-panel { width: 400px; border-left: 1px solid var(--border); background: #fcfdfe; display: flex; flex-direction: column; padding: 24px; overflow-y: auto; }
+        .main-stage { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 30px; overflow-y: auto; }
 
-        /* --- Visual Components (Image-Style) --- */
-        .diagram-container { position: relative; width: 100%; max-width: 900px; height: 500px; margin-top: 20px; border: 1px solid #f1f5f9; border-radius: 24px; background: #fafbfc; }
-        
-        .lb-hub {
-            position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
-            width: 160px; height: 60px; background: #475569; border-radius: 12px; color: #fff;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 0.7rem; font-weight: 800; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        /* --- Simulation Area --- */
+        .deployment-grid { 
+            display: flex; align-items: stretch; gap: 20px; width: 100%; min-height: 500px;
+            position: relative;
         }
-        .lb-hub::after { content: '...'; position: absolute; right: 12px; top: 12px; letter-spacing: 2px; }
 
-        .comp-group { position: absolute; top: 220px; display: flex; width: 100%; justify-content: space-around; padding: 0 40px; }
-        
-        /* Device */
-        .client-device { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .laptop { 
-            width: 160px; height: 100px; background: #cbd5e1; border-radius: 10px; position: relative; border: 5px solid #94a3b8; 
-            transition: 0.3s;
+        .instance-box {
+            flex: 1; border: 1.5px solid #cbd5e1; border-radius: 20px; padding: 25px;
+            display: flex; flex-direction: column; gap: 20px; position: relative;
         }
-        .screen { position: absolute; top: 5px; left: 5px; right: 5px; bottom: 12px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .base { position: absolute; bottom: -10px; left: -12px; right: -12px; height: 10px; background: #94a3b8; border-radius: 0 0 12px 12px; }
-        .ext-icon { width: 50px; transition: 0.3s; }
-        .updating-overlay { position: absolute; inset: 0; background: rgba(59, 130, 246, 0.9); color: #fff; display: none; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 900; }
-
-        /* Servers */
-        .server-grid { display: flex; gap: 20px; }
-        .server {
-            width: 140px; height: 180px; background: #eff6ff; border: 2.5px solid #dbeafe; border-radius: 16px;
-            display: flex; flex-direction: column; padding: 12px; gap: 10px; transition: 0.5s; position: relative;
+        .instance-box.test { background: var(--test-bg); }
+        .instance-box.prod { background: var(--prod-bg); border-color: #bae6fd; }
+        
+        .box-label { 
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: #fff; border: 1.5px solid inherit; padding: 4px 20px; border-radius: 20px;
+            font-size: 0.9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .server.updating { border-color: var(--warning); background: #fffbeb; }
-        .server.ready { border-color: var(--success); background: #f0fdf4; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
-        
-        .layer { height: 40px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--text-dim); }
-        .layer.app { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
-        .layer.db { background: #f1f5f9; color: #475569; }
+        .test .box-label { border-color: #cbd5e1; }
+        .prod .box-label { border-color: #bae6fd; color: var(--primary); }
 
-        /* Connectors */
-        .line-svg { position: absolute; inset: 0; pointer-events: none; }
-        line { stroke: #cbd5e1; stroke-width: 2.5; stroke-dasharray: 6; transition: 0.5s; }
-        line.active { stroke: var(--primary); stroke-dasharray: 0; }
-
-        /* --- Command Center --- */
-        .pipeline-card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; position: relative; }
-        .pipeline-card.locked { opacity: 0.4; pointer-events: none; }
-        .card-label { font-size: 0.65rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; margin-bottom: 15px; display: block; }
-
-        .step-pill { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .step-num { width: 24px; height: 24px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: var(--text-dim); transition: 0.3s; }
-        .step-pill.active .step-num { background: var(--primary); color: #fff; }
-        .step-pill.complete .step-num { background: var(--success); color: #fff; }
-        
-        .decision-ui { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); }
-        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
-        
-        .btn { 
-            width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 10px; 
-            font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: 0.2s;
+        /* --- Rollout Tracks --- */
+        .rollout-track {
+            flex: 1; border: 1px dashed #94a3b8; border-radius: 12px; padding: 15px;
+            display: flex; flex-direction: column; position: relative;
         }
+        .track-gac { background: var(--gac-color); border-color: #fecaca; }
+        .track-be { background: var(--be-color); border-color: #ddd6fe; }
+
+        .track-label { 
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim);
+            margin-bottom: 10px; display: flex; justify-content: space-between;
+        }
+        .track-label b { color: var(--text); }
+
+        .track-content { flex: 1; display: flex; align-items: center; justify-content: center; gap: 30px; position: relative; }
+
+        /* --- Components --- */
+        .component { display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s; }
+        .laptop { width: 80px; height: 50px; background: #cbd5e1; border: 3px solid #94a3b8; border-radius: 6px; position: relative; }
+        .laptop::after { content: ''; position: absolute; bottom: -6px; left: -8px; right: -8px; height: 4px; background: #94a3b8; border-radius: 0 0 5px 5px; }
+        .laptop-screen { position: absolute; inset: 3px; background: #fff; display: flex; align-items: center; justify-content: center; }
+        .ext-icon { width: 25px; }
+
+        .server-group { display: flex; gap: 10px; }
+        .server { 
+            width: 70px; height: 90px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px;
+            display: flex; flex-direction: column; padding: 6px; gap: 4px; transition: 0.5s;
+        }
+        .server.updating { border-color: var(--warning); animation: pulse-warn 1.5s infinite; }
+        .server.ready { border-color: var(--success); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+        
+        .layer { height: 18px; border-radius: 3px; background: #f1f5f9; font-size: 0.45rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; }
+        .layer.app { background: #dbeafe; color: #1e40af; }
+        .layer.db { background: #f8fafc; color: #64748b; }
+
+        .ver-pill { font-family: var(--mono); font-size: 0.55rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: #fff; border: 1px solid var(--border); }
+        .ver-pill.new { color: var(--primary); border-color: var(--primary); }
+
+        /* --- Decision Logic --- */
+        .decision-center {
+            width: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
+            padding-top: 40px;
+        }
+        .connector-line { width: 40px; height: 2px; background: #cbd5e1; }
+        .decision-gate {
+            width: 48px; height: 48px; border-radius: 50%; border: 2px solid #cbd5e1; background: #fff;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
+        }
+        .decision-gate.ok:hover { border-color: var(--success); color: var(--success); background: #f0fdf4; }
+        .decision-gate.fail:hover { border-color: var(--error); color: var(--error); background: #fef2f2; }
+        .decision-gate.selected.ok { background: var(--success); border-color: var(--success); color: #fff; box-shadow: 0 0 15px var(--success); }
+        .decision-gate.selected.fail { background: var(--error); border-color: var(--error); color: #fff; box-shadow: 0 0 15px var(--error); }
+        
+        .decision-gate i { font-size: 28px; }
+
+        /* --- Controls & Workflow --- */
+        .workflow-bar {
+            background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+            display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .step-info { flex: 1; }
+        .step-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+        .step-desc { font-size: 0.85rem; font-weight: 600; }
+
+        .btn {
+            padding: 12px 24px; border-radius: 10px; border: none; font-weight: 700; font-size: 0.8rem;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover:not(:disabled) { filter: brightness(0.9); }
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-success { background: var(--success); }
-        .btn-danger { background: var(--error); }
 
-        .log-area { flex: 1; background: #0f172a; border-radius: 16px; padding: 20px; font-family: var(--mono); font-size: 0.65rem; overflow-y: auto; }
-        .log-item { color: #94a3b8; margin-bottom: 8px; line-height: 1.5; }
-        .log-item b { color: #4ade80; }
+        /* --- Animations --- */
+        @keyframes pulse-warn { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        .path-line { position: absolute; z-index: -1; pointer-events: none; }
+        .arrow-svg { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 100%; height: 100%; }
+        line { stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 4; }
+        line.active { stroke: var(--primary); stroke-dasharray: 0; transition: 0.8s; }
 
-        .ver-badge { font-family: var(--mono); font-size: 0.55rem; font-weight: 800; color: var(--primary); padding: 2px 6px; background: var(--primary-soft); border-radius: 4px; margin-top: 5px; }
-
-        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 20px; }
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 24px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">VLAUNCHER <span>ARCHITECTURE STUDIO</span></div>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <div id="sys-status" style="font-size: 0.65rem; font-weight: 800; color: var(--success); background: #f0fdf4; border: 1px solid #dcfce7; padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 8px;">
-                <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></div> STATUS: NOMINAL
-            </div>
-            <button class="btn" style="width: 40px; padding: 0; background: #f1f5f9; color: var(--text);" onclick="location.reload()"><span class="material-symbols-rounded">refresh</span></button>
-        </div>
+        <div class="header-title">VLAUNCHER <span>DEPLOYMENT STUDIO</span></div>
+        <button class="btn" style="background: #f1f5f9; color: var(--text); padding: 8px 15px;" onclick="resetSim()">
+            <span class="material-symbols-rounded" style="font-size: 18px;">refresh</span> Reset
+        </button>
     </header>
 
-    <nav class="nav-tabs">
-        <button class="nav-btn active" id="tab-single" onclick="switchArch('single')">Single Server Architecture</button>
-        <button class="nav-btn" id="tab-ha" onclick="switchArch('ha')">HA Cluster Architecture</button>
-    </nav>
-
-    <div class="main-container">
-        <!-- Visual Stage -->
-        <div class="arch-stage">
-            <div class="diagram-container">
-                <div class="lb-hub">Load Balancer</div>
-                
-                <!-- SVG Lines -->
-                <svg class="line-svg" id="lines-svg">
-                    <line x1="50%" y1="100" x2="25%" y2="220" id="line-client" />
-                    <line x1="50%" y1="100" x2="75%" y2="220" id="line-srv1" />
-                    <line x1="50%" y1="100" x2="65%" y2="220" id="line-srv2" style="display:none;" />
-                    <line x1="50%" y1="100" x2="85%" y2="220" id="line-srv3" style="display:none;" />
-                </svg>
-
-                <div class="comp-group">
-                    <!-- ChromeOS Device -->
-                    <div class="client-device">
-                        <div class="laptop">
-                            <div class="screen">
-                                <img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-icon" id="ext-img">
-                                <div class="updating-overlay" id="ext-updating">UPDATING...</div>
-                            </div>
-                            <div class="base"></div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 0.75rem; font-weight: 800;">VLauncher Extension</div>
-                            <div style="font-size: 0.6rem; color: var(--text-dim);">Managed ChromeOS Device</div>
-                            <div class="ver-badge" id="v-ext">v1.2.2</div>
-                        </div>
-                    </div>
-
-                    <!-- Servers -->
-                    <div class="server-grid" id="srv-grid">
-                        <div class="server" id="s1">
-                            <div class="layer">...</div>
-                            <div class="layer app">Application</div>
-                            <div class="layer db">Database</div>
-                            <div class="layer">...</div>
-                            <div style="margin-top: auto; text-align: center;">
-                                <div style="font-size: 0.65rem; font-weight: 800; color: var(--text-dim);">Windows Server</div>
-                                <div class="ver-badge" id="v-s1">v1.2.2</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-top: 30px; width: 100%; max-width: 900px; padding: 20px; background: #fff7ed; border: 1px solid #ffedd5; border-radius: 16px; font-size: 0.8rem; color: #9a3412; line-height: 1.6;">
-                <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 8px;">info</span>
-                <b>Deployment Guardrail:</b> Rollback is disabled in GA to maintain protocol synchronization between the Client Extension and Admin Studio Backend. Validation OUs are the primary path for safety.
-            </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="control-panel">
-            <!-- Phase 1: Extension -->
-            <div class="pipeline-card" id="card-p1">
-                <span class="card-label">Phase 1: Extension Update</span>
-                <div class="step-pill active" id="pill-p1s1">
-                    <div class="step-num">1</div>
-                    <div style="font-size: 0.75rem; font-weight: 700;">GAC Push (Test OU)</div>
-                </div>
-                <button class="btn" id="btn-p1" onclick="runPhase1()">Begin Extension Rollout</button>
-                
-                <div class="decision-ui" id="dec-p1">
-                    <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-dim);">VALIDATION AUDIT:</div>
-                    <div class="btn-group">
-                        <button class="btn btn-success" onclick="endPhase1('ok')">Validation OK</button>
-                        <button class="btn btn-danger" onclick="endPhase1('fail')">Issue Found</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Phase 2: Backend -->
-            <div class="pipeline-card locked" id="card-p2">
-                <span class="card-label">Phase 2: Backend Rollout</span>
-                <div class="step-pill" id="pill-p2s1">
-                    <div class="step-num">2</div>
-                    <div style="font-size: 0.75rem; font-weight: 700;">Admin Studio Update</div>
-                </div>
-                <button class="btn" id="btn-p2" onclick="runPhase2()">Update Backend Infrastructure</button>
-            </div>
-
-            <span class="card-label">Mission Logs</span>
-            <div class="log-area" id="log-list">
-                <div class="log-item"><span>10:51:00</span> Console linked. <b>Single Server</b> baseline detected.</div>
-            </div>
-        </div>
+    <div class="nav-bar">
+        <div class="nav-item active" id="nav-single" onclick="setMode('single')">Single Server Deployment</div>
+        <div class="nav-item" id="nav-ha" onclick="setMode('ha')">Multiple Server Deployment (HA)</div>
     </div>
 
-    <script>
-        let arch = 'single';
-        const srvGrid = document.getElementById('srv-grid');
-        const logList = document.getElementById('log-list');
-
-        function addLog(msg) {
-            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
-            const item = document.createElement('div');
-            item.className = 'log-item';
-            item.innerHTML = `<span>${time}</span> ${msg}`;
-            logList.prepend(item);
-        }
-
-        function switchArch(type) {
-            arch = type;
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + type).classList.add('active');
+    <main class="main-stage">
+        
+        <div class="deployment-grid">
             
-            // Adjust Visuals
-            const line2 = document.getElementById('line-srv2');
-            const line3 = document.getElementById('line-srv3');
-            const line1 = document.getElementById('line-srv1');
-            
-            if(type === 'ha') {
-                line1.setAttribute('x2', '55%');
-                line2.style.display = 'block';
-                line3.style.display = 'block';
-                srvGrid.innerHTML = `
-                    <div class="server" id="s1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div><div style="margin-top: auto; text-align: center;"><div class="ver-badge" id="v-s1">v1.2.2</div></div></div>
-                    <div class="server" id="s2"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div><div style="margin-top: auto; text-align: center;"><div class="ver-badge" id="v-s2">v1.2.2</div></div></div>
-                    <div class="server" id="s3"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div><div style="margin-top: auto; text-align: center;"><div class="ver-badge" id="v-s3">v1.2.2</div></div></div>
-                `;
-                addLog(`Switched to <b>HA Cluster</b>. Multi-node synchronization enabled.`);
-            } else {
-                line1.setAttribute('x2', '75%');
-                line2.style.display = 'none';
-                line3.style.display = 'none';
-                srvGrid.innerHTML = `
-                    <div class="server" id="s1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div><div style="margin-top: auto; text-align: center;"><div class="ver-badge" id="v-s1">v1.2.2</div></div></div>
-                `;
-                addLog(`Switched to <b>Single Server</b> baseline.`);
-            }
-        }
-
-        /* --- Phase 1 Logic --- */
-        function runPhase1() {
-            document.getElementById('btn-p1').disabled = true;
-            document.getElementById('ext-updating').style.display = 'flex';
-            document.getElementById('line-client').classList.add('active');
-            addLog("Pushing <b>v1.2.4-GA</b> to Google Admin Console (Test OU)...");
-            
-            setTimeout(() => {
-                document.getElementById('ext-updating').style.display = 'none';
-                document.getElementById('v-ext').innerText = 'v1.2.4-GA (TEST)';
-                document.getElementById('v-ext').style.color = 'var(--warning)';
-                document.getElementById('dec-p1').style.display = 'block';
-                addLog("Update staged. Awaiting user validation of Extension behavior.");
-            }, 2000);
-        }
-
-        function endPhase1(status) {
-            document.getElementById('dec-p1').style.display = 'none';
-            if(status === 'ok') {
-                document.getElementById('pill-p1s1').classList.remove('active');
-                document.getElementById('pill-p1s1').classList.add('complete');
-                document.getElementById('btn-p1').innerText = 'Phase 1 Complete';
-                document.getElementById('v-ext').innerText = 'v1.2.4-GA (PROD)';
-                document.getElementById('v-ext').style.color = 'var(--success)';
-                addLog("<b>Validation OK</b>. Promoting Extension to Production OU.");
+            <!-- TEST INSTANCE -->
+            <div class="instance-box test">
+                <div class="box-label">Test Instance</div>
                 
-                // Unlock Phase 2
-                document.getElementById('card-p2').classList.remove('locked');
-                document.getElementById('pill-p2s1').classList.add('active');
-            } else {
-                addLog("<b>Issue Detected</b>. Rollout halted. Client remains on stable v1.2.2.");
-            }
-        }
+                <!-- GAC Extension Track -->
+                <div class="rollout-track track-gac">
+                    <div class="track-label">Google Admin Console - <b>Extension Rollout</b></div>
+                    <div class="track-content">
+                        <div class="component">
+                            <span class="material-symbols-rounded" style="color: var(--primary); font-size: 40px;">send</span>
+                        </div>
+                        <svg class="arrow-svg"><line x1="60" y1="50%" x2="calc(100% - 100px)" y2="50%" id="line-test-gac" /></svg>
+                        <div class="component">
+                            <div class="laptop">
+                                <div class="laptop-screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-icon"></div>
+                            </div>
+                            <div class="ver-pill" id="ver-test-ext">v1.2.2</div>
+                            <span style="font-size: 0.5rem; font-weight: 800; color: var(--text-dim);">Test OU</span>
+                        </div>
+                    </div>
+                </div>
 
-        /* --- Phase 2 Logic --- */
-        function runPhase2() {
-            document.getElementById('btn-p2').disabled = true;
-            document.getElementById('line-srv1').classList.add('active');
-            if(arch === 'ha') {
-                document.getElementById('line-srv2').classList.add('active');
-                document.getElementById('line-srv3').classList.add('active');
+                <!-- Backend Rollout Track -->
+                <div class="rollout-track track-be">
+                    <div class="track-label">AD & Windows Server - <b>Backend Rollout</b></div>
+                    <div class="track-content">
+                        <div class="component">
+                            <span class="material-symbols-rounded" style="color: #8b5cf6; font-size: 40px;">layers</span>
+                        </div>
+                        <svg class="arrow-svg"><line x1="60" y1="50%" x2="calc(100% - 120px)" y2="50%" id="line-test-be" /></svg>
+                        <div class="component">
+                            <div style="background: #475569; padding: 4px 10px; border-radius: 4px; color: #fff; font-size: 0.5rem; font-weight: 800; margin-bottom: 5px;">LOAD BALANCER</div>
+                            <div class="server-group" id="test-srv-group">
+                                <div class="server" id="ts1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                            </div>
+                            <div class="ver-pill" id="ver-test-be">v1.2.2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DECISION CENTER -->
+            <div class="decision-center" id="decision-center" style="opacity: 0.2; pointer-events: none;">
+                <div class="decision-gate ok" onclick="decide('ok')" title="Validation OK - Promote to Production">
+                    <span class="material-symbols-rounded">check_circle</span>
+                </div>
+                <div class="decision-gate fail" onclick="decide('fail')" title="Issue Found - Halt Rollout">
+                    <span class="material-symbols-rounded">cancel</span>
+                </div>
+            </div>
+
+            <!-- PRODUCTION INSTANCE -->
+            <div class="instance-box prod" id="prod-box" style="opacity: 0.4;">
+                <div class="box-label">Production Instance</div>
+                
+                <!-- GAC Extension Track -->
+                <div class="rollout-track track-gac">
+                    <div class="track-label">Google Admin Console - <b>Extension Rollout</b></div>
+                    <div class="track-content">
+                        <div class="component">
+                            <span class="material-symbols-rounded" id="prod-gac-icon" style="color: #94a3b8; font-size: 40px;">send</span>
+                        </div>
+                        <svg class="arrow-svg"><line x1="60" y1="50%" x2="calc(100% - 100px)" y2="50%" id="line-prod-gac" /></svg>
+                        <div class="component">
+                            <div class="laptop">
+                                <div class="laptop-screen"><img src="https://ruchini-silva-codimite.github.io/vl-simulator/vlauncher-logo.png" class="ext-icon"></div>
+                            </div>
+                            <div class="ver-pill" id="ver-prod-ext">v1.2.2</div>
+                            <span style="font-size: 0.5rem; font-weight: 800; color: var(--text-dim);">Prod OU</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend Rollout Track -->
+                <div class="rollout-track track-be">
+                    <div class="track-label">AD & Windows Server - <b>Backend Rollout</b></div>
+                    <div class="track-content">
+                        <div class="component">
+                            <span class="material-symbols-rounded" id="prod-be-icon" style="color: #94a3b8; font-size: 40px;">layers</span>
+                        </div>
+                        <svg class="arrow-svg"><line x1="60" y1="50%" x2="calc(100% - 120px)" y2="50%" id="line-prod-be" /></svg>
+                        <div class="component">
+                            <div style="background: #94a3b8; padding: 4px 10px; border-radius: 4px; color: #fff; font-size: 0.5rem; font-weight: 800; margin-bottom: 5px;" id="prod-lb-tag">LOAD BALANCER</div>
+                            <div class="server-group" id="prod-srv-group">
+                                <div class="server" id="ps1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                            </div>
+                            <div class="ver-pill" id="ver-prod-be">v1.2.2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="workflow-bar">
+            <div class="step-info">
+                <div class="step-label" id="wf-step-label">Current Step: 01</div>
+                <div class="step-desc" id="wf-step-desc">Introduce VLauncher v1.2.4 update to the Test Instance.</div>
+            </div>
+            <button class="btn btn-primary" id="btn-next" onclick="nextWorkflow()">
+                Stage Update to Test <span class="material-symbols-rounded">arrow_forward</span>
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        let mode = 'single';
+        let step = 1;
+
+        function setMode(m) {
+            if(step > 1) {
+                if(!confirm("Changing architecture will reset the current simulation. Proceed?")) return;
+                resetSim();
             }
+            mode = m;
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('nav-' + m).classList.add('active');
             
-            const servers = document.querySelectorAll('.server');
-            servers.forEach(s => s.classList.add('updating'));
-            addLog(`Updating Backend binaries on <b>${arch.toUpperCase()}</b> infrastructure...`);
-
-            setTimeout(() => {
-                servers.forEach(s => {
-                    s.classList.remove('updating');
-                    s.classList.add('ready');
-                    s.querySelector('.ver-badge').innerText = 'v1.2.4-GA';
-                    s.querySelector('.ver-badge').style.color = 'var(--success)';
-                });
-                document.getElementById('pill-p2s1').classList.remove('active');
-                document.getElementById('pill-p2s1').classList.add('complete');
-                document.getElementById('btn-p2').innerText = 'Update Successful';
-                addLog("<b>Backend Sync OK</b>. Extension and Infrastructure are now aligned.");
-                document.getElementById('sys-status').innerHTML = `<div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%;"></div> STATUS: ALIGNED_v1.2.4`;
-            }, 2500);
+            updateSrvGroups();
         }
+
+        function updateSrvGroups() {
+            const tGroup = document.getElementById('test-srv-group');
+            const pGroup = document.getElementById('prod-srv-group');
+            
+            if(mode === 'ha') {
+                tGroup.innerHTML = `
+                    <div class="server" id="ts1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                    <div class="server" id="ts2"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                    <div class="server" id="ts3"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                `;
+                pGroup.innerHTML = `
+                    <div class="server" id="ps1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                    <div class="server" id="ps2"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                    <div class="server" id="ps3"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>
+                `;
+            } else {
+                tGroup.innerHTML = `<div class="server" id="ts1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>`;
+                pGroup.innerHTML = `<div class="server" id="ps1"><div class="layer">...</div><div class="layer app">Application</div><div class="layer db">Database</div><div class="layer">...</div></div>`;
+            }
+        }
+
+        function nextWorkflow() {
+            if(step === 1) {
+                // Stage to Test
+                document.getElementById('line-test-gac').classList.add('active');
+                document.getElementById('line-test-be').classList.add('active');
+                document.querySelectorAll('.test .server').forEach(s => s.classList.add('updating'));
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.test .server').forEach(s => { s.classList.remove('updating'); s.classList.add('ready'); });
+                    document.getElementById('ver-test-ext').innerText = 'v1.2.4-GA';
+                    document.getElementById('ver-test-ext').classList.add('new');
+                    document.getElementById('ver-test-be').innerText = 'v1.2.4-GA';
+                    document.getElementById('ver-test-be').classList.add('new');
+                    
+                    document.getElementById('wf-step-label').innerText = 'Current Step: 02';
+                    document.getElementById('wf-step-desc').innerText = 'Validation in progress... Verify auth, launch, and ' + (mode === 'ha' ? 'failover' : 'persistence') + '.';
+                    document.getElementById('btn-next').innerText = 'Complete Validation';
+                    step = 2;
+                }, 1500);
+
+            } else if(step === 2) {
+                // Complete Validation
+                document.getElementById('decision-center').style.opacity = '1';
+                document.getElementById('decision-center').style.pointerEvents = 'auto';
+                document.getElementById('wf-step-label').innerText = 'Step 03: Decision';
+                document.getElementById('wf-step-desc').innerText = 'Validation finished. Decide based on audit results.';
+                document.getElementById('btn-next').style.display = 'none';
+                step = 3;
+            }
+        }
+
+        function decide(res) {
+            document.querySelectorAll('.decision-gate').forEach(g => g.classList.remove('selected'));
+            document.querySelector('.decision-gate.' + res).classList.add('selected');
+            document.getElementById('decision-center').style.pointerEvents = 'none';
+
+            if(res === 'ok') {
+                document.getElementById('prod-box').style.opacity = '1';
+                document.getElementById('prod-gac-icon').style.color = 'var(--primary)';
+                document.getElementById('prod-be-icon').style.color = '#8b5cf6';
+                document.getElementById('prod-lb-tag').style.background = '#475569';
+                
+                setTimeout(() => {
+                    document.getElementById('line-prod-gac').classList.add('active');
+                    document.getElementById('line-prod-be').classList.add('active');
+                    document.querySelectorAll('.prod .server').forEach(s => s.classList.add('updating'));
+                    
+                    setTimeout(() => {
+                        document.querySelectorAll('.prod .server').forEach(s => { s.classList.remove('updating'); s.classList.add('ready'); });
+                        document.getElementById('ver-prod-ext').innerText = 'v1.2.4-GA';
+                        document.getElementById('ver-prod-ext').classList.add('new');
+                        document.getElementById('ver-prod-be').innerText = 'v1.2.4-GA';
+                        document.getElementById('ver-prod-be').classList.add('new');
+                        
+                        document.getElementById('wf-step-desc').innerText = 'Update successfully promoted to Production.';
+                        document.getElementById('wf-step-desc').style.color = 'var(--success)';
+                    }, 1500);
+                }, 500);
+            } else {
+                document.getElementById('wf-step-desc').innerText = 'Rollout Halted. Production Instance remains stable on v1.2.2.';
+                document.getElementById('wf-step-desc').style.color = 'var(--error)';
+            }
+        }
+
+        function resetSim() {
+            location.reload();
+        }
+
+        updateSrvGroups();
     </script>
 </body>
 </html>
