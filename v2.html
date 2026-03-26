@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLauncher Architecture Studio v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #030712;
+            --surface: #111827;
+            --surface-light: #1f2937;
+            --border: #374151;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --text: #f9fafb;
+            --text-dim: #9ca3af;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* --- Tabs Navigation --- */
+        .tab-nav {
+            display: flex; gap: 4px; padding: 20px 40px 0; background: var(--bg); border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            padding: 12px 24px; background: transparent; border: none; color: var(--text-dim); cursor: pointer;
+            font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; border-radius: 12px 12px 0 0;
+            transition: 0.2s; position: relative;
+        }
+        .tab-btn.active { color: var(--primary); background: var(--surface); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--primary); }
+
+        .tab-content { display: none; flex: 1; padding: 40px; overflow-y: auto; }
+        .tab-content.active { display: flex; flex-direction: column; gap: 30px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1; }
+        .card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 24px;
+            display: flex; flex-direction: column; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .card-title { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 8px; }
+
+        /* --- Panel B: Backend Update Logic --- */
+        .backend-container { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+        .env-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .env-btn {
+            flex: 1; padding: 10px; border-radius: 10px; background: var(--surface-light); border: 1px solid var(--border);
+            color: var(--text-dim); font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .env-btn.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+
+        .infra-view {
+            height: 180px; background: rgba(0,0,0,0.2); border-radius: 16px; border: 1px dashed var(--border);
+            display: flex; align-items: center; justify-content: space-around; padding: 20px; position: relative;
+        }
+        .server-node {
+            display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.5s;
+        }
+        .server-icon {
+            width: 50px; height: 60px; background: #1e293b; border: 2px solid var(--border); border-radius: 8px;
+            position: relative; display: flex; align-items: center; justify-content: center;
+        }
+        .server-icon::before { content: ''; position: absolute; top: 10px; left: 8px; width: 4px; height: 4px; background: var(--text-dim); border-radius: 50%; box-shadow: 0 8px 0 var(--text-dim), 0 16px 0 var(--text-dim); }
+        .server-node.updating .server-icon { border-color: var(--warning); box-shadow: 0 0 15px var(--warning); }
+        .server-node.ready .server-icon { border-color: var(--success); box-shadow: 0 0 15px var(--success); }
+        .server-label { font-size: 0.6rem; font-family: var(--mono); color: var(--text-dim); }
+
+        /* --- GAC Extension Logic --- */
+        .pipeline-track {
+            height: 80px; background: rgba(255,255,255,0.02); border-radius: 40px; position: relative;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 40px;
+        }
+        .stage-mark { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .stage-circle { width: 12px; height: 12px; background: var(--border); border-radius: 50%; transition: 0.4s; }
+        .stage-mark.active .stage-circle { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .stage-name { font-size: 0.65rem; text-transform: uppercase; font-weight: 700; color: var(--text-dim); }
+
+        .package {
+            position: absolute; width: 130px; height: 50px; background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4); transition: 1s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        .pkg-tag { font-size: 0.5rem; font-weight: 900; color: white; opacity: 0.6; }
+        .pkg-ver { font-size: 0.75rem; font-family: var(--mono); font-weight: 700; }
+        .ext-badge { position: absolute; top: -8px; right: -8px; background: var(--warning); color: #000; font-size: 0.5rem; font-weight: 900; padding: 2px 6px; border-radius: 4px; }
+
+        /* --- Cluster Uninstallation --- */
+        .cluster-ring { display: flex; justify-content: center; gap: 24px; padding: 20px; }
+        .node-big {
+            width: 100px; height: 120px; background: #1e293b; border: 2px solid var(--primary); border-radius: 16px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transition: 0.6s;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+        .node-big.removed { transform: scale(0.6) translateY(50px); opacity: 0; filter: blur(5px); }
+        .node-big .status-led { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+        /* --- Logs & Global --- */
+        .log-stream {
+            height: 100px; background: #000; border-radius: 12px; padding: 12px; font-family: var(--mono); font-size: 0.7rem; overflow-y: hidden;
+            display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--border);
+        }
+        .log-entry { color: #4ade80; opacity: 0.8; }
+        .log-entry span { color: var(--text-dim); margin-right: 8px; }
+
+        .arch-note {
+            background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px; padding: 20px;
+            font-size: 0.8rem; line-height: 1.6; color: var(--text-dim);
+        }
+        .arch-note strong { color: var(--primary); }
+
+        .controls { display: flex; gap: 10px; margin-top: auto; }
+        .btn {
+            flex: 1; background: var(--surface-light); border: 1px solid var(--border); padding: 12px; border-radius: 12px;
+            color: var(--text); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s;
+        }
+        .btn:hover:not(:disabled) { background: #374151; }
+        .btn.primary { background: var(--primary); border: none; }
+        .btn.danger { color: var(--error); border-color: rgba(239, 68, 68, 0.2); }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <nav class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('rollout')">Controlled Rollout</button>
+        <button class="tab-btn" onclick="switchTab('lifecycle')">Lifecycle Management</button>
+    </nav>
+
+    <!-- Tab 1: Controlled Rollout -->
+    <div id="tab-rollout" class="tab-content active">
+        <div class="grid-2">
+            
+            <!-- Google Admin Console -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="material-symbols-rounded">settings_ethernet</span>
+                        Google Admin Console (Client)
+                    </div>
+                    <div id="gac-status" style="font-size: 0.6rem; color: var(--primary); font-weight: 800; background: rgba(59,130,246,0.1); padding: 4px 8px; border-radius: 4px;">EXTENSION READY</div>
+                </div>
+
+                <div class="pipeline-track" style="margin: 40px 0;">
+                    <div class="stage-mark active" id="gac-m1"><div class="stage-circle"></div><span class="stage-name">Stable</span></div>
+                    <div class="stage-mark" id="gac-m2"><div class="stage-circle"></div><span class="stage-name">Test OU</span></div>
+                    <div class="stage-mark" id="gac-m3"><div class="stage-circle"></div><span class="stage-name">Prod OU</span></div>
+                    
+                    <div class="package" id="gac-pkg">
+                        <div class="ext-badge">Extension</div>
+                        <span class="pkg-tag">VLAUNCHER</span>
+                        <span class="pkg-ver">v1.2.4-GA</span>
+                    </div>
+                </div>
+
+                <div class="log-stream" id="gac-logs">
+                    <div class="log-entry"><span>[GAC]</span> Awaiting deployment trigger...</div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" onclick="gacToTest()" id="gac-btn-test">Inject Test OU</button>
+                    <button class="btn primary" onclick="gacToProd()" id="gac-btn-prod" disabled>Promote Prod OU</button>
+                </div>
+            </div>
+
+            <!-- Admin Studio Backend -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="material-symbols-rounded">dns</span>
+                        Admin Studio (Backend Infrastructure)
+                    </div>
+                </div>
+
+                <div class="backend-container">
+                    <div class="env-selector">
+                        <button class="env-btn active" id="env-solo" onclick="setBackendEnv('solo')">Solo Server (Test)</button>
+                        <button class="env-btn" id="env-ha" onclick="setBackendEnv('ha')">HA Cluster (Test)</button>
+                    </div>
+
+                    <div class="infra-view" id="backend-nodes">
+                        <!-- Dynamic Server Icons -->
+                        <div class="server-node" id="sn-1">
+                            <div class="server-icon"><span class="material-symbols-rounded" style="font-size: 30px; opacity: 0.2;">window</span></div>
+                            <span class="server-label">SRV_T01</span>
+                        </div>
+                    </div>
+
+                    <div class="log-stream" id="be-logs">
+                        <div class="log-entry"><span>[SYS]</span> Infrastructure standby.</div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn" onclick="validateBackend()" id="be-btn-val">Validate Update</button>
+                        <button class="btn primary" onclick="rolloutBackend()" id="be-btn-roll" disabled>Rollout to Prod</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arch-note">
+            <span class="material-symbols-rounded" style="vertical-align: middle; color: var(--warning);">info</span>
+            <strong>Architectural Safety:</strong> Rollback is intentionally <strong>not introduced in GA</strong>. This prevents version drift between the 
+            <em>Google Admin Console Extension</em> and the <em>Admin Studio Backend</em>. Since both components must remain synchronized to handle VDI launch protocols, a 
+            controlled forward-roll via separate Test OUs (for extension) and Test Instances (for backend) is the mandatory validation path.
+        </div>
+    </div>
+
+    <!-- Tab 2: Lifecycle Management -->
+    <div id="tab-lifecycle" class="tab-content">
+        <div class="grid-2">
+            <!-- HA Cluster Visual -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">HA Cluster Governance</div>
+                    <div id="quorum-pill" style="font-size: 0.6rem; color: var(--success); font-weight: 900; border: 1px solid var(--success); padding: 2px 8px; border-radius: 4px;">QUORUM: OK</div>
+                </div>
+
+                <div class="cluster-ring">
+                    <div class="node-big" id="un-1"><div class="status-led"></div><span class="material-symbols-rounded" style="font-size: 40px;">dns</span><span style="font-size: 0.6rem; font-family: var(--mono);">NODE_A</span></div>
+                    <div class="node-big" id="un-2"><div class="status-led"></div><span class="material-symbols-rounded" style="font-size: 40px;">dns</span><span style="font-size: 0.6rem; font-family: var(--mono);">NODE_B</span></div>
+                    <div class="node-big" id="un-3"><div class="status-led"></div><span class="material-symbols-rounded" style="font-size: 40px;">dns</span><span style="font-size: 0.6rem; font-family: var(--mono);">NODE_C</span></div>
+                </div>
+
+                <div class="log-stream" id="un-logs" style="height: 140px;">
+                    <div class="log-entry"><span>[CLUSTER]</span> Cluster active. Nodes synced.</div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" onclick="singleUninstall()">Single Node Uninstallation</button>
+                    <button class="btn danger" onclick="clusterUninstall()">Cluster-Wide Uninstallation</button>
+                    <button class="btn" style="flex: 0; width: 50px;" onclick="resetLifecycle()"><span class="material-symbols-rounded">refresh</span></button>
+                </div>
+            </div>
+
+            <!-- Documentation Info -->
+            <div class="card">
+                <div class="card-title" style="margin-bottom: 20px;">Requirement Summary</div>
+                <div style="font-size: 0.85rem; line-height: 1.8; color: var(--text-dim);">
+                    <h4 style="color: var(--text); margin-bottom: 10px;">Uninstallation Best Practices</h4>
+                    <p><strong>1. Single Node:</strong> Used for maintenance or scaling down. The uninstaller removes the node from the cluster metadata before purging local binaries. Quorum must be maintained (n/2 + 1).</p>
+                    <p style="margin-top: 15px;"><strong>2. Cluster-Wide:</strong> Used for full environment migration or decommissioning. This triggers a global wipe of the configuration store and node records.</p>
+                    
+                    <div style="margin-top: 30px; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.2); border-left: 4px solid var(--primary);">
+                        <span style="font-weight: 800; color: var(--text); font-size: 0.7rem; text-transform: uppercase;">Active Directory Note</span><br>
+                        Removing VLauncher from a server does not automatically delete the AD Computer Object. Cleanup of the <code>OU: Vlauncher</code> objects should be verified manually.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        function addLog(id, msg) {
+            const el = document.getElementById(id);
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            const line = document.createElement('div');
+            line.className = 'log-entry';
+            line.innerHTML = `<span>[${time}]</span> ${msg}`;
+            el.prepend(line);
+        }
+
+        /* --- GAC Logic --- */
+        const gPkg = document.getElementById('gac-pkg');
+        function gacToTest() {
+            gPkg.style.left = "calc(50% - 65px)";
+            addLog('gac-logs', "Pushing v1.2.4 to Test OU in Admin Console...");
+            document.getElementById('gac-m1').classList.remove('active');
+            document.getElementById('gac-m2').classList.add('active');
+            document.getElementById('gac-btn-test').disabled = true;
+            document.getElementById('gac-btn-prod').disabled = false;
+        }
+        function gacToProd() {
+            gPkg.style.left = "calc(100% - 140px)";
+            addLog('gac-logs', "Promoting to Prod OU. Global rollout active.");
+            document.getElementById('gac-m2').classList.remove('active');
+            document.getElementById('gac-m3').classList.add('active');
+            document.getElementById('gac-btn-prod').disabled = true;
+        }
+
+        /* --- Backend Logic --- */
+        let beMode = 'solo';
+        function setBackendEnv(mode) {
+            beMode = mode;
+            document.getElementById('env-solo').classList.toggle('active', mode === 'solo');
+            document.getElementById('env-ha').classList.toggle('active', mode === 'ha');
+            const container = document.getElementById('backend-nodes');
+            if (mode === 'solo') {
+                container.innerHTML = '<div class="server-node" id="sn-1"><div class="server-icon"><span class="material-symbols-rounded" style="font-size: 30px; opacity: 0.2;">window</span></div><span class="server-label">SRV_T01</span></div>';
+                addLog('be-logs', "Environment: Solo Server selected.");
+            } else {
+                container.innerHTML = `
+                    <div class="server-node" id="sn-1"><div class="server-icon"><span class="material-symbols-rounded" style="font-size: 30px; opacity: 0.2;">window</span></div><span class="server-label">SRV_T01</span></div>
+                    <div class="server-node" id="sn-2"><div class="server-icon"><span class="material-symbols-rounded" style="font-size: 30px; opacity: 0.2;">window</span></div><span class="server-label">SRV_T02</span></div>
+                    <div class="server-node" id="sn-3"><div class="server-icon"><span class="material-symbols-rounded" style="font-size: 30px; opacity: 0.2;">window</span></div><span class="server-label">SRV_T03</span></div>
+                `;
+                addLog('be-logs', "Environment: HA Cluster selected (High Fidelity Test).");
+            }
+        }
+
+        function validateBackend() {
+            const nodes = document.querySelectorAll('#backend-nodes .server-node');
+            nodes.forEach(n => n.classList.add('updating'));
+            addLog('be-logs', `Updating Test Instance (${beMode.toUpperCase()})...`);
+            
+            setTimeout(() => {
+                nodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
+                if (beMode === 'solo') {
+                    addLog('be-logs', "VALIDATION OK. Warning: HA Protocol logic not tested in Solo mode.");
+                } else {
+                    addLog('be-logs', "VALIDATION OK. Quorum and Heartbeat protocols verified.");
+                }
+                document.getElementById('be-btn-roll').disabled = false;
+            }, 1500);
+        }
+
+        function rolloutBackend() {
+            addLog('be-logs', "ROLLING OUT TO PROD CLUSTER. Success.");
+            document.getElementById('be-btn-roll').disabled = true;
+        }
+
+        /* --- Lifecycle Logic --- */
+        const nodes = [document.getElementById('un-1'), document.getElementById('un-2'), document.getElementById('un-3')];
+        function singleUninstall() {
+            nodes[1].classList.add('removed');
+            addLog('un-logs', "Removing NODE_B from Cluster records...");
+            setTimeout(() => {
+                document.getElementById('quorum-pill').innerText = "QUORUM: MAINTAINED (2/3)";
+                document.getElementById('quorum-pill').style.color = "var(--primary)";
+                addLog('un-logs', "Integrity check: PASS. System remains online.");
+            }, 1000);
+        }
+        function clusterUninstall() {
+            nodes.forEach(n => n.classList.add('removed'));
+            addLog('un-logs', "INITIATING CLUSTER-WIDE UNINSTALLATION...");
+            setTimeout(() => {
+                document.getElementById('quorum-pill').innerText = "OFFLINE";
+                document.getElementById('quorum-pill').style.color = "var(--error)";
+                addLog('un-logs', "All node records purged from AD and Config Store.");
+            }, 1200);
+        }
+        function resetLifecycle() {
+            nodes.forEach(n => n.classList.remove('removed'));
+            document.getElementById('quorum-pill').innerText = "QUORUM: OK";
+            document.getElementById('quorum-pill').style.color = "var(--success)";
+            addLog('un-logs', "Lifecycle reset. Cluster re-joined.");
+        }
+    </script>
+</body>
+</html>
