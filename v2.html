@@ -125,7 +125,7 @@
         .ver.new { color: var(--success); }
 
         /* Gate and Validation placement */
-        .val-anchor { position: absolute; right: -25px; top: 50%; transform: translateY(-50%); z-index: 100; display: none; }
+        .val-anchor { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 100; display: none; }
         .gate-center { width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding-top: 60px; }
         .gate-btn {
             width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--border); background: var(--surface);
@@ -145,10 +145,11 @@
         .log-entry span { color: var(--text-dim); margin-right: 10px; }
 
         .btn-val {
-            padding: 12px 20px; background: var(--success); color: #fff; border: none; border-radius: 10px;
-            font-size: 0.7rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px;
-            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 0 20px var(--success-glow);
+            padding: 8px 16px; background: var(--success); color: #fff; border: none; border-radius: 8px;
+            font-size: 0.6rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 0 15px var(--success-glow);
         }
+        .btn-val .material-symbols-rounded { font-size: 18px; }
 
         /* SVG Paths fully connected */
         .path-svg { position: absolute; inset: 0; pointer-events: none; width: 100%; height: 100%; }
@@ -186,7 +187,7 @@
             <div class="instance-card test">
                 <div class="card-tag">Test Instance</div>
                 
-                <!-- VAL BUTTON ANCHOR -->
+                <!-- VAL BUTTON ANCHOR - Centered in Test Instance -->
                 <div class="val-anchor" id="val-anchor">
                     <button class="btn-val" onclick="completeValidation()">
                         Complete Validation <span class="material-symbols-rounded">fact_check</span>
@@ -255,7 +256,7 @@
             </div>
 
             <div class="instance-card prod" id="card-prod" style="opacity: 0.3;">
-                <div class="card-tag">Production Environment</div>
+                <div class="card-tag">Production Instance</div>
 
                 <div class="track">
                     <div class="track-header">
@@ -265,7 +266,7 @@
                     <div class="track-visual">
                         <div class="source-node" style="left: 10px; opacity: 0.3;"></div>
                         <div class="package" id="pkg-prod-ext"></div>
-                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 90px)" y2="50%" id="l-prod-ext" /></svg>
+                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 90px)" y2="50%" id="l-p-ext" /></svg>
                         <div class="device">
                             <div class="laptop" id="lap-prod">
                                 <div class="screen">
@@ -288,7 +289,7 @@
                     <div class="track-visual">
                         <div class="source-node be" style="left: 10px; opacity: 0.3;"></div>
                         <div class="package" id="pkg-prod-be"></div>
-                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-prod-be" /></svg>
+                        <svg class="path-svg"><line x1="18" y1="50%" x2="calc(100% - 70px)" y2="50%" id="l-p-be" /></svg>
                         <div class="server-rack" id="rack-prod">
                             <div class="node"><div class="layer">...</div><div class="layer app">App</div><div class="layer db">DB</div><div class="layer">...</div></div>
                         </div>
@@ -353,7 +354,6 @@
             
             setTimeout(() => {
                 pkg.style.transition = 'left 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-                // Stop inside the laptop or server rack
                 pkg.style.left = 'calc(100% - ' + offset + 'px)';
                 line.classList.add(pkgId.includes('be') ? 'active-be' : 'active');
             }, 50);
@@ -419,13 +419,13 @@
                 document.getElementById('card-prod').style.opacity = '1';
                 
                 setTimeout(() => {
-                    animatePackage('pkg-prod-ext', 'l-prod-ext', 70, () => {
+                    animatePackage('pkg-prod-ext', 'l-p-ext', 70, () => {
                         document.getElementById('lap-prod').classList.add('ready');
                         document.getElementById('v-prod-ext').innerText = 'v1.2.4-GA';
                         document.getElementById('v-prod-ext').classList.add('new');
                     });
 
-                    animatePackage('pkg-prod-be', 'l-prod-be', 50, () => {
+                    animatePackage('pkg-prod-be', 'l-p-be', 50, () => {
                         const prodNodes = document.querySelectorAll('#rack-prod .node');
                         prodNodes.forEach(n => { n.classList.remove('updating'); n.classList.add('ready'); });
                         document.getElementById('v-prod-be').innerText = 'v1.2.4-GA';
