@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLauncher Architecture Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #030712;
+            --surface: #111827;
+            --border: #1f2937;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.4);
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --text: #f9fafb;
+            --text-dim: #9ca3af;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px;
+            overflow: hidden;
+        }
+
+        .simulator-container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            height: 600px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- Simulation 1: HA Cluster --- */
+        .cluster-viewport {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            position: relative;
+        }
+
+        .nodes-ring {
+            display: flex;
+            gap: 32px;
+            position: relative;
+        }
+
+        .node {
+            width: 120px;
+            height: 140px;
+            background: #1e293b;
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .node::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            width: 40px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .node.removed {
+            transform: scale(0.5) translateY(100px);
+            opacity: 0;
+            filter: blur(10px);
+        }
+
+        .node .label { font-family: var(--mono); font-size: 0.8rem; font-weight: 700; color: var(--text-dim); }
+        .node .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .status-display {
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 24px;
+            border-radius: 12px;
+            border-left: 4px solid var(--success);
+            width: 100%;
+            color: var(--success);
+        }
+
+        /* --- Simulation 2: Pipeline --- */
+        .pipeline-viewport {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 60px;
+            padding: 0 20px;
+        }
+
+        .pipeline-track {
+            height: 100px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+        }
+
+        .stage-mark {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            z-index: 2;
+        }
+
+        .stage-circle {
+            width: 16px;
+            height: 16px;
+            background: var(--border);
+            border-radius: 50%;
+            border: 2px solid var(--bg);
+            transition: 0.4s;
+        }
+
+        .stage-mark.active .stage-circle { background: var(--primary); box-shadow: 0 0 15px var(--primary); }
+        .stage-name { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); font-weight: 700; }
+
+        .package-entity {
+            position: absolute;
+            width: 140px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            border-radius: 16px;
+            top: 15px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 10;
+            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .package-entity .pkg-label { font-size: 0.7rem; font-weight: 800; color: white; opacity: 0.7; }
+        .package-entity .pkg-version { font-family: var(--mono); font-weight: 700; color: white; }
+
+        .log-stream {
+            height: 80px;
+            background: #000;
+            border-radius: 12px;
+            padding: 12px;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-entry { color: #4ade80; opacity: 0.8; }
+        .log-entry span { color: #9ca3af; margin-right: 8px; }
+
+        /* --- Global UI --- */
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .btn {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 14px;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: var(--text-dim); }
+        .btn.primary { background: var(--primary); color: white; border: none; }
+        .btn.primary:hover:not(:disabled) { background: #2563eb; }
+        .btn.danger { color: var(--error); border-color: rgba(239, 68, 68, 0.3); }
+        .btn.danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.1); }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
+    </style>
+</head>
+<body>
+
+<div class="simulator-container">
+    
+    <!-- Cluster Simulation -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <span class="material-symbols-rounded">cloud_sync</span>
+                High Availability Governance
+            </div>
+            <div id="quorum-pill" class="badge" style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 4px 10px; border-radius: 100px; font-size: 0.7rem; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2);">ACTIVE</div>
+        </div>
+
+        <div class="cluster-viewport">
+            <div class="nodes-ring" id="node-container">
+                <div class="node" id="node-1">
+                    <div class="pulse"></div>
+                    <span class="material-symbols-rounded" style="font-size: 40px; color: var(--primary);">dns</span>
+                    <span class="label">VL_NODE_A</span>
+                </div>
+                <div class="node" id="node-2">
+                    <div class="pulse"></div>
+                    <span class="material-symbols-rounded" style="font-size: 40px; color: var(--primary);">dns</span>
+                    <span class="label">VL_NODE_B</span>
+                </div>
+                <div class="node" id="node-3">
+                    <div class="pulse"></div>
+                    <span class="material-symbols-rounded" style="font-size: 40px; color: var(--primary);">dns</span>
+                    <span class="label">VL_NODE_C</span>
+                </div>
+            </div>
+
+            <div class="status-display" id="cluster-status">
+                <span style="opacity: 0.5;">STATUS:</span> CLUSTER_HEALTHY [3/3 NODES]
+            </div>
+        </div>
+
+        <div class="log-stream" id="cluster-logs">
+            <div class="log-entry"><span>[14:45:01]</span> Service initialized. Syncing metadata...</div>
+            <div class="log-entry"><span>[14:45:02]</span> Quorum verified. Raft index: 4892</div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="simNodeRemoval()" id="btn-node">
+                <span class="material-symbols-rounded">person_remove</span>
+                Extract Node
+            </button>
+            <button class="btn danger" onclick="simClusterWipe()" id="btn-wipe">
+                <span class="material-symbols-rounded">power_off</span>
+                Decommission
+            </button>
+            <button class="btn" style="width: 50px; flex: none;" onclick="resetCluster()">
+                <span class="material-symbols-rounded">refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Pipeline Simulation -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <span class="material-symbols-rounded">rocket</span>
+                GAC Update Pipeline
+            </div>
+            <div class="badge" id="pkg-status" style="background: rgba(59, 130, 246, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 100px; font-size: 0.7rem; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.2);">STABLE</div>
+        </div>
+
+        <div class="pipeline-viewport">
+            <div class="pipeline-track">
+                <div class="stage-mark active" id="mark-0">
+                    <div class="stage-circle"></div>
+                    <span class="stage-name">Stable</span>
+                </div>
+                <div class="stage-mark" id="mark-1">
+                    <div class="stage-circle"></div>
+                    <span class="stage-name">Test OU</span>
+                </div>
+                <div class="stage-mark" id="mark-2">
+                    <div class="stage-circle"></div>
+                    <span class="stage-name">Global</span>
+                </div>
+                
+                <div class="package-entity" id="package">
+                    <span class="pkg-label">VLAUNCHER</span>
+                    <span class="pkg-version">v1.2.4-GA</span>
+                </div>
+            </div>
+
+            <div class="log-stream" id="pipeline-logs">
+                <div class="log-entry"><span>[SYS]</span> Version 1.2.4 ready for GAC submission.</div>
+                <div class="log-entry"><span>[SYS]</span> Idle. Awaiting operational decision.</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn primary" onclick="moveTest()" id="btn-test">
+                <span class="material-symbols-rounded">science</span>
+                Deploy to Test
+            </button>
+            <button class="btn" onclick="moveGlobal()" id="btn-global" disabled>
+                <span class="material-symbols-rounded">public</span>
+                Full Release
+            </button>
+            <button class="btn danger" onclick="haltRelease()" id="btn-halt" disabled>
+                <span class="material-symbols-rounded">cancel</span>
+                Emergency Halt
+            </button>
+            <button class="btn" style="width: 50px; flex: none;" onclick="resetPipeline()">
+                <span class="material-symbols-rounded">refresh</span>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- Cluster Logic ---
+    const clusterLogs = document.getElementById('cluster-logs');
+    const clusterStatus = document.getElementById('cluster-status');
+    const nodes = [
+        document.getElementById('node-1'),
+        document.getElementById('node-2'),
+        document.getElementById('node-3')
+    ];
+
+    function addLog(container, text) {
+        const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `<span>[${time}]</span> ${text}`;
+        container.prepend(entry);
+    }
+
+    function simNodeRemoval() {
+        nodes[1].classList.add('removed');
+        addLog(clusterLogs, "Extracting Node VL_NODE_B...");
+        setTimeout(() => {
+            clusterStatus.innerHTML = '<span style="opacity: 0.5;">STATUS:</span> QUORUM_RETAINED [2/3 NODES]';
+            clusterStatus.style.borderColor = 'var(--primary)';
+            clusterStatus.style.color = 'var(--primary)';
+            addLog(clusterLogs, "Re-balancing cluster... Success.");
+            addLog(clusterLogs, "System online. Uninterrupted service.");
+        }, 1000);
+        document.getElementById('btn-node').disabled = true;
+    }
+
+    function simClusterWipe() {
+        nodes.forEach(n => n.classList.add('removed'));
+        addLog(clusterLogs, "INITIATING GLOBAL DECOMMISSION...");
+        setTimeout(() => {
+            clusterStatus.innerHTML = '<span style="opacity: 0.5;">STATUS:</span> ENVIRONMENT_OFFLINE';
+            clusterStatus.style.borderColor = 'var(--error)';
+            clusterStatus.style.color = 'var(--error)';
+            document.getElementById('quorum-pill').innerText = 'OFFLINE';
+            document.getElementById('quorum-pill').style.color = 'var(--error)';
+            document.getElementById('quorum-pill').style.background = 'rgba(239, 68, 68, 0.1)';
+            addLog(clusterLogs, "All nodes disconnected. Config purged.");
+        }, 1200);
+        document.getElementById('btn-node').disabled = true;
+        document.getElementById('btn-wipe').disabled = true;
+    }
+
+    function resetCluster() {
+        nodes.forEach(n => n.classList.remove('removed'));
+        clusterStatus.innerHTML = '<span style="opacity: 0.5;">STATUS:</span> CLUSTER_HEALTHY [3/3 NODES]';
+        clusterStatus.style.borderColor = 'var(--success)';
+        clusterStatus.style.color = 'var(--success)';
+        document.getElementById('quorum-pill').innerText = 'ACTIVE';
+        document.getElementById('quorum-pill').style.color = 'var(--success)';
+        document.getElementById('quorum-pill').style.background = 'rgba(16, 185, 129, 0.1)';
+        document.getElementById('btn-node').disabled = false;
+        document.getElementById('btn-wipe').disabled = false;
+        clusterLogs.innerHTML = '<div class="log-entry"><span>[SYS]</span> System reset to baseline.</div>';
+    }
+
+    // --- Pipeline Logic ---
+    const pkg = document.getElementById('package');
+    const pipeLogs = document.getElementById('pipeline-logs');
+    const marks = [document.getElementById('mark-0'), document.getElementById('mark-1'), document.getElementById('mark-2')];
+
+    function moveTest() {
+        pkg.style.left = "calc(50% - 70px)";
+        pkg.style.background = "linear-gradient(135deg, var(--warning), #d97706)";
+        document.getElementById('pkg-status').innerText = 'TESTING';
+        document.getElementById('pkg-status').style.color = 'var(--warning)';
+        marks[0].classList.remove('active');
+        marks[1].classList.add('active');
+        addLog(pipeLogs, "Pushing v1.2.4 to GAC Test OU...");
+        addLog(pipeLogs, "Validation pending on pilot devices.");
+        
+        document.getElementById('btn-test').disabled = true;
+        document.getElementById('btn-global').disabled = false;
+        document.getElementById('btn-halt').disabled = false;
+    }
+
+    function moveGlobal() {
+        pkg.style.left = "calc(100% - 160px)";
+        pkg.style.background = "linear-gradient(135deg, var(--success), #059669)";
+        document.getElementById('pkg-status').innerText = 'GLOBAL';
+        document.getElementById('pkg-status').style.color = 'var(--success)';
+        marks[1].classList.remove('active');
+        marks[2].classList.add('active');
+        addLog(pipeLogs, "Validation complete. Pushing to Production...");
+        addLog(pipeLogs, "Global Rollout Active. 100% distribution.");
+        
+        document.getElementById('btn-global').disabled = true;
+        document.getElementById('btn-halt').disabled = true;
+    }
+
+    function haltRelease() {
+        pkg.style.left = "20px";
+        pkg.style.background = "linear-gradient(135deg, var(--error), #dc2626)";
+        document.getElementById('pkg-status').innerText = 'HALTED';
+        document.getElementById('pkg-status').style.color = 'var(--error)';
+        marks[1].classList.remove('active');
+        marks[0].classList.add('active');
+        addLog(pipeLogs, "ANOMALY DETECTED. HALTING ROLLOUT.");
+        addLog(pipeLogs, "Reverting Test OU via GAC Control... Reverted.");
+        
+        document.getElementById('btn-global').disabled = true;
+        document.getElementById('btn-halt').disabled = true;
+    }
+
+    function resetPipeline() {
+        pkg.style.left = "20px";
+        pkg.style.background = "linear-gradient(135deg, var(--primary), #1d4ed8)";
+        document.getElementById('pkg-status').innerText = 'STABLE';
+        document.getElementById('pkg-status').style.color = 'var(--primary)';
+        marks.forEach(m => m.classList.remove('active'));
+        marks[0].classList.add('active');
+        document.getElementById('btn-test').disabled = false;
+        document.getElementById('btn-global').disabled = true;
+        document.getElementById('btn-halt').disabled = true;
+        pipeLogs.innerHTML = '<div class="log-entry"><span>[SYS]</span> Pipeline reset to baseline.</div>';
+    }
+</script>
+
+</body>
+</html>
