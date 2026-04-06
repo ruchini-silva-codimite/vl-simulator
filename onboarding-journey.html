@@ -1,0 +1,603 @@
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    :root {
+        --bg-color: #0A0F1C;
+        --surface-color: #151F32;
+        --surface-highlight: #1E2A44;
+        --border-color: #2A3B5C;
+        --primary-blue: #3B82F6;
+        --primary-glow: rgba(59, 130, 246, 0.5);
+        --success-green: #10B981;
+        --success-glow: rgba(16, 185, 129, 0.5);
+        --text-primary: #F8FAFC;
+        --text-secondary: #94A3B8;
+        --mono-font: 'JetBrains Mono', monospace;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+
+    .header {
+        background: rgba(10, 15, 28, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 20px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 1.25rem;
+        letter-spacing: -0.5px;
+    }
+
+    .brand span {
+        color: var(--primary-blue);
+        text-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .status-badge {
+        font-family: var(--mono-font);
+        font-size: 0.75rem;
+        color: var(--success-green);
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        padding: 6px 12px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .status-badge::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: var(--success-green);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--success-glow);
+        animation: pulse 2s infinite;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .journey-container {
+        display: flex;
+        gap: 40px;
+        align-items: stretch;
+    }
+
+    .persona-panel {
+        flex: 1;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .persona-panel:hover {
+        border-color: var(--primary-blue);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(59, 130, 246, 0.1);
+    }
+
+    .persona-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .persona-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--surface-highlight), var(--border-color));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .admin-icon { color: #A78BFA; }
+    .user-icon { color: #60A5FA; }
+
+    .persona-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+    }
+
+    .persona-subtitle {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    .step-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: relative;
+    }
+
+    .step-list::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        bottom: 20px;
+        width: 2px;
+        background: var(--border-color);
+        z-index: 0;
+    }
+
+    .step-item {
+        display: flex;
+        gap: 16px;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+        padding: 16px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        background: transparent;
+        border: 1px solid transparent;
+    }
+
+    .step-item:hover, .step-item.active {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: var(--border-color);
+    }
+
+    .step-item.active {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .step-marker {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--surface-color);
+        border: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .step-item.active .step-marker, .step-item.completed .step-marker {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+        box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .step-item.completed .step-marker {
+        background: var(--success-green);
+        border-color: var(--success-green);
+        box-shadow: 0 0 15px var(--success-glow);
+    }
+
+    .step-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .step-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0 0 4px 0;
+        color: var(--text-primary);
+    }
+
+    .step-desc {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .preview-panel {
+        flex: 1.2;
+        background: #000;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+    }
+
+    .preview-header {
+        background: #1A1A1A;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid #333;
+    }
+
+    .browser-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+    .dot:nth-child(1) { background: #FF5F56; }
+    .dot:nth-child(2) { background: #FFBD2E; }
+    .dot:nth-child(3) { background: #27C93F; }
+
+    .browser-url {
+        flex: 1;
+        background: #2D2D2D;
+        border-radius: 6px;
+        padding: 6px 16px;
+        font-family: var(--mono-font);
+        font-size: 0.75rem;
+        color: #888;
+        text-align: center;
+    }
+
+    .preview-body {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        position: relative;
+        background: radial-gradient(circle at center, #111 0%, #000 100%);
+    }
+
+    /* Mock UIs */
+    .mock-ui {
+        width: 100%;
+        max-width: 500px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 30px;
+        display: none;
+        flex-direction: column;
+        gap: 20px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        animation: fadeInScale 0.4s ease forwards;
+    }
+
+    .mock-ui.active {
+        display: flex;
+    }
+
+    .mock-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-align: center;
+        margin: 0;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .mock-btn {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        width: 100%;
+        box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .mock-btn:hover {
+        background: #2563EB;
+        transform: translateY(-2px);
+    }
+
+    .mock-btn.secondary {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        box-shadow: none;
+    }
+
+    .mock-btn.secondary:hover {
+        background: rgba(255,255,255,0.05);
+    }
+
+    /* Connections */
+    .connection-line {
+        position: absolute;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .connection-line path {
+        fill: none;
+        stroke: var(--border-color);
+        stroke-width: 2;
+        stroke-dasharray: 6 6;
+    }
+
+    .connection-line path.active {
+        stroke: var(--primary-blue);
+        stroke-dasharray: none;
+        filter: drop-shadow(0 0 8px var(--primary-glow));
+        animation: flowDash 1s linear infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes flowDash {
+        to { stroke-dashoffset: -12; }
+    }
+
+    /* Controls */
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+        background: rgba(21, 31, 50, 0.5);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+</style>
+
+<div class="header">
+    <div class="brand">VLauncher <span>Customer Onboarding Journey</span></div>
+    <div class="status-badge">LIVE SIMULATION</div>
+</div>
+
+<div class="main-content">
+    <div class="journey-container">
+        
+        <!-- IT Admin Panel -->
+        <div class="persona-panel" id="admin-panel">
+            <div class="persona-header">
+                <div class="persona-icon admin-icon">⚙️</div>
+                <div>
+                    <h2 class="persona-title">IT Administrator</h2>
+                    <p class="persona-subtitle">Google Workspace / AD Manager</p>
+                </div>
+            </div>
+            
+            <div class="step-list">
+                <div class="step-item active" onclick="activateStep(1)" data-step="1">
+                    <div class="step-marker">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Deploy Extension</h3>
+                        <p class="step-desc">Push VLauncher to managed devices via Google Admin Console.</p>
+                    </div>
+                </div>
+                <div class="step-item" onclick="activateStep(2)" data-step="2">
+                    <div class="step-marker">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Configure Backend</h3>
+                        <p class="step-desc">Setup Active Directory sync and configure endpoint policies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Area -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                <div class="browser-dots">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+                <div class="browser-url" id="browser-url">admin.google.com/ac/chrome/apps</div>
+                <div style="width: 42px;"></div>
+            </div>
+            <div class="preview-body" id="preview-body">
+                
+                <!-- Step 1 UI -->
+                <div class="mock-ui active" id="ui-1">
+                    <h3 class="mock-title">Google Admin: Chrome Apps & Extensions</h3>
+                    <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 15px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 40px; height: 40px; background: var(--primary-blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold;">VL</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600;">VLauncher Enterprise</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">ID: abcdefghijklmnop</div>
+                        </div>
+                        <div style="font-size: 0.8rem; background: rgba(16, 185, 129, 0.2); color: var(--success-green); padding: 4px 8px; border-radius: 4px;">Allowed</div>
+                    </div>
+                    <button class="mock-btn" onclick="completeStep(1)">Force Install on OU</button>
+                </div>
+
+                <!-- Step 2 UI -->
+                <div class="mock-ui" id="ui-2">
+                    <h3 class="mock-title">VLauncher Admin Console</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <label style="font-size: 0.85rem; color: var(--text-secondary);">Active Directory Sync</label>
+                        <input type="text" value="ldap://dc1.corp.local" style="background: #000; border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 6px;" readonly>
+                    </div>
+                    <button class="mock-btn" onclick="completeStep(2)">Test & Save Configuration</button>
+                </div>
+
+                <!-- Step 3 UI -->
+                <div class="mock-ui" id="ui-3">
+                    <div style="text-align: center;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-blue); border-radius: 12px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px;">VL</div>
+                        <h3 class="mock-title" style="border: none;">Welcome to VLauncher</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Your IT administrator has deployed VLauncher. Please sign in to sync your profile.</p>
+                    </div>
+                    <button class="mock-btn" onclick="completeStep(3)">Sign in with Google</button>
+                </div>
+
+                <!-- Step 4 UI -->
+                <div class="mock-ui" id="ui-4">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="width: 100%; height: 120px; background: rgba(59, 130, 246, 0.1); border: 1px dashed var(--primary-blue); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary-blue); font-weight: 600;">Desktop Sync Active</div>
+                        <div style="width: 100%; padding: 15px; background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success-green); border-radius: 4px; font-size: 0.85rem;">
+                            Profile configured successfully. Connected to domain backend.
+                        </div>
+                    </div>
+                    <button class="mock-btn secondary" onclick="resetJourney()">Restart Simulation</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- End User Panel -->
+        <div class="persona-panel" id="user-panel">
+            <div class="persona-header">
+                <div class="persona-icon user-icon">👤</div>
+                <div>
+                    <h2 class="persona-title">End User</h2>
+                    <p class="persona-subtitle">Employee / Managed Device</p>
+                </div>
+            </div>
+            
+            <div class="step-list">
+                <div class="step-item" onclick="activateStep(3)" data-step="3">
+                    <div class="step-marker">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Initial Login</h3>
+                        <p class="step-desc">User launches Chrome and authenticates via SSO.</p>
+                    </div>
+                </div>
+                <div class="step-item" onclick="activateStep(4)" data-step="4">
+                    <div class="step-marker">4</div>
+                    <div class="step-content">
+                        <h3 class="step-title">Profile Sync</h3>
+                        <p class="step-desc">VLauncher silently syncs local environment with AD profile.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="controls">
+        <button class="mock-btn secondary" style="width: auto;" onclick="resetJourney()">Reset Journey</button>
+        <button class="mock-btn" style="width: auto;" onclick="autoPlay()">Auto-Play Demo</button>
+    </div>
+</div>
+
+<script>
+    const urls = {
+        1: "admin.google.com/ac/chrome/apps",
+        2: "console.vlauncher.com/settings/ad",
+        3: "chrome-extension://abcdefghijklmnop/login.html",
+        4: "chrome-extension://abcdefghijklmnop/dashboard.html"
+    };
+
+    let currentStep = 1;
+    let autoPlayInterval = null;
+
+    function activateStep(stepNum) {
+        currentStep = stepNum;
+        
+        // Update Steps UI
+        document.querySelectorAll('.step-item').forEach(el => {
+            const num = parseInt(el.getAttribute('data-step'));
+            el.classList.remove('active');
+            if (num < stepNum) el.classList.add('completed');
+            if (num === stepNum) el.classList.add('active');
+            if (num > stepNum) el.classList.remove('completed');
+        });
+
+        // Update Mock UIs
+        document.querySelectorAll('.mock-ui').forEach(el => el.classList.remove('active'));
+        document.getElementById(`ui-${stepNum}`).classList.add('active');
+
+        // Update URL
+        document.getElementById('browser-url').innerText = urls[stepNum];
+        
+        // Style Panels
+        const adminPanel = document.getElementById('admin-panel');
+        const userPanel = document.getElementById('user-panel');
+        
+        if(stepNum <= 2) {
+            adminPanel.style.borderColor = "var(--primary-blue)";
+            adminPanel.style.boxShadow = "0 0 20px rgba(59, 130, 246, 0.1)";
+            userPanel.style.borderColor = "var(--border-color)";
+            userPanel.style.boxShadow = "none";
+        } else {
+            userPanel.style.borderColor = "var(--primary-blue)";
+            userPanel.style.boxShadow = "0 0 20px rgba(59, 130, 246, 0.1)";
+            adminPanel.style.borderColor = "var(--border-color)";
+            adminPanel.style.boxShadow = "none";
+        }
+    }
+
+    function completeStep(stepNum) {
+        if (stepNum < 4) {
+            activateStep(stepNum + 1);
+        }
+    }
+
+    function resetJourney() {
+        if(autoPlayInterval) clearInterval(autoPlayInterval);
+        document.querySelectorAll('.step-item').forEach(el => el.classList.remove('completed'));
+        activateStep(1);
+    }
+
+    function autoPlay() {
+        resetJourney();
+        let step = 1;
+        autoPlayInterval = setInterval(() => {
+            completeStep(step);
+            step++;
+            if(step > 4) clearInterval(autoPlayInterval);
+        }, 2000);
+    }
+</script>
